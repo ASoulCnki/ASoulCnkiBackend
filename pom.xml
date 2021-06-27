@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <description>Backend project of asoulcnki.asia</description>
+    <groupId>asia.asoucnki</groupId>
+    <artifactId>api</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.springframework.boot</groupId>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <dependencies>
+        <dependency>
+            <artifactId>spring-boot-starter</artifactId>
+            <groupId>org.springframework.boot</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>org.springframework.boot</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>lombok</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <optional>true</optional>
+        </dependency>
+
+
+        <dependency>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <groupId>com.baomidou</groupId>
+            <version>3.4.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>druid</artifactId>
+            <groupId>com.alibaba</groupId>
+            <version>${druid-version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>mysql-connector-java</artifactId>
+            <groupId>mysql</groupId>
+            <scope>runtime</scope>
+            <version>${mysql-connector-java.version}</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>commons-lang3</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>springfox-boot-starter</artifactId>
+            <groupId>io.springfox</groupId>
+            <version>3.0.0</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>guava</artifactId>
+            <groupId>com.google.guava</groupId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>slf4j-api</artifactId>
+            <groupId>org.slf4j</groupId>
+            <version>${slf4j-api.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>mybatis-plus-generator</artifactId>
+            <groupId>com.baomidou</groupId>
+            <version>3.4.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>velocity-engine-core</artifactId>
+            <groupId>org.apache.velocity</groupId>
+            <version>2.2</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>fastjson</artifactId>
+            <groupId>com.alibaba</groupId>
+            <version>1.2.41</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>jjwt</artifactId>
+            <groupId>io.jsonwebtoken</groupId>
+            <scope>compile</scope>
+            <version>0.9.1</version>
+        </dependency>
+        <dependency>
+            <artifactId>spring-boot-starter-redis</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>lettuce-core</artifactId>
+                    <groupId>io.lettuce</groupId>
+                </exclusion>
+            </exclusions>
+            <groupId>org.springframework.boot</groupId>
+            <version>1.3.5.RELEASE</version>
+        </dependency>
+        <dependency>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <groupId>org.springframework.boot</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>gson</artifactId>
+            <groupId>com.google.code.gson</groupId>
+            <scope>compile</scope>
+            <version>2.8.6</version>
+        </dependency>
+        <dependency>
+            <artifactId>tencentcloud-sdk-java</artifactId>
+            <groupId>com.tencentcloudapi</groupId>
+            <version>3.1.62</version><!-- 注：这里只是示例版本号，请获取并替换为 最新的版本号 -->
+        </dependency>
+        <dependency>
+            <artifactId>hibernate-validator</artifactId>
+            <groupId>org.hibernate.validator</groupId>
+            <version>6.0.17.Final</version>
+        </dependency>
+    </dependencies>
+
+
+    <parent>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <groupId>org.springframework.boot</groupId>
+        <relativePath/>
+        <version>2.3.4.RELEASE</version> <!-- lookup parent from repository -->
+    </parent>
+
+
+    <properties>
+        <commons-lang3.version>3.4</commons-lang3.version>
+        <druid-version>1.1.5</druid-version>
+        <guava.version>18.0</guava.version>
+        <guava.version>18.0</guava.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <mysql-connector-java.version>8.0.21</mysql-connector-java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <slf4j-api.version>1.7.25</slf4j-api.version>
+        <springfox-swagger2.version>3.0.0</springfox-swagger2.version>
+    </properties>
+
+</project>

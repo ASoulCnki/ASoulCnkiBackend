@@ -1,0 +1,18 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+logs/
+.mvn/
+
+database.dat
+/src/main/resources/application-dev.yml
+/src/main/resources/application-pro.yml
