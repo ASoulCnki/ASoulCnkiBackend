@@ -1,34 +1,38 @@
 package asia.asoulcnki.api.common.duplicationcheck;
 
 import asia.asoulcnki.api.persistence.entity.Reply;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class ComparisonDatabase implements Serializable {
-	private static final long serialVersionUID = -5543208627621913003L;
-	private static final String IMAGE_PATH = "database.dat";
+public class ComparisonDatabase {
+	public static final String DEFAULT_IMAGE_PATH = "data/database.dat";
+	private final static Logger log = LoggerFactory.getLogger(ComparisonDatabase.class);
 	private static ComparisonDatabase instance;
 	private transient ReadWriteLock rwLock;
+
 	private int minTime;
 	private int maxTime;
-	private long max_rpid;
+	private long maxRpid;
 	// reply id -> reply
 	private Map<Long, Reply> replyMap;
 	//  text hash -> reply ids
 	private Map<Long, ArrayList<Long>> textHashMap;
 
 	private ComparisonDatabase() {
-		this.max_rpid = 0;
+		this.maxRpid = 0;
 		this.minTime = Integer.MAX_VALUE;
 		this.maxTime = 0;
 		this.rwLock = new ReentrantReadWriteLock();
@@ -41,7 +45,10 @@ public class ComparisonDatabase implements Serializable {
 			synchronized (ComparisonDatabase.class) {
 				if (instance == null) {
 					try {
-						instance = loadFromImage(IMAGE_PATH);
+						long start = System.currentTimeMillis();
+						log.info("start to load comparison database...");
+						instance = loadFromImage(DEFAULT_IMAGE_PATH);
+						log.info("load database cost {} ms", System.currentTimeMillis() - start);
 					} catch (Exception e) {
 						instance = new ComparisonDatabase();
 					}
@@ -52,9 +59,13 @@ public class ComparisonDatabase implements Serializable {
 		return instance;
 	}
 
-	private static ComparisonDatabase loadFromImage(String path) throws IOException, ClassNotFoundException {
-		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
-		return (ComparisonDatabase) ois.readObject();
+	private static ComparisonDatabase loadFromImage(String path) throws IOException {
+		Kryo kryo = new Kryo();
+		File file = new File(path);
+		Input input = new Input(new FileInputStream(file));
+		ComparisonDatabase db = kryo.readObject(input, ComparisonDatabase.class);
+		input.close();
+		return db;
 	}
 
 	private void readLock() {
@@ -73,15 +84,18 @@ public class ComparisonDatabase implements Serializable {
 		this.rwLock.writeLock().unlock();
 	}
 
-	private void dumpToImage(String path) throws IOException {
-		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path));
-		oos.writeObject(this);
+	public void dumpToImage(String path) throws IOException {
+		Kryo kryo = new Kryo();
+		File file = new File(path);
+		Output output = new Output(new FileOutputStream(file));
+		kryo.writeObject(output, this);
+		output.close();
 	}
 
 	private void reset() {
 		this.writeLock();
 		try {
-			this.max_rpid = 0;
+			this.maxRpid = 0;
 			this.minTime = Integer.MAX_VALUE;
 			this.maxTime = 0;
 			this.replyMap = new HashMap<>();
@@ -95,6 +109,9 @@ public class ComparisonDatabase implements Serializable {
 		if (reply == null || replyMap.containsKey(reply.getRpid())) {
 			return;
 		}
+		if (reply.getContent().codePointCount(0, reply.getContent().length()) < 4) {
+			return;
+		}
 		this.replyMap.put(reply.getRpid(), reply);
 
 		if (reply.getCtime() > this.maxTime) {
@@ -103,8 +120,8 @@ public class ComparisonDatabase implements Serializable {
 		if (reply.getCtime() < this.minTime) {
 			this.minTime = reply.getCtime();
 		}
-		if (reply.getRpid() > this.max_rpid) {
-			this.max_rpid = reply.getRpid();
+		if (reply.getRpid() > this.maxRpid) {
+			this.maxRpid = reply.getRpid();
 		}
 
 		ArrayList<Long> textHashList = SummaryHash.defaultHash(reply.getContent());
@@ -118,12 +135,38 @@ public class ComparisonDatabase implements Serializable {
 	}
 
 	public Reply getReply(long rpid) {
-		return replyMap.get(rpid);
+		try {
+			this.readLock();
+			return replyMap.get(rpid);
+		} finally {
+			this.readUnLock();
+		}
 	}
 
 	public ArrayList<Long> searchHash(long textHash) {
-		return this.textHashMap.get(textHash);
+		try {
+			this.readLock();
+			return this.textHashMap.get(textHash);
+		} finally {
+			this.readUnLock();
+		}
 	}
 
+
+	public ReadWriteLock getRwLock() {
+		return rwLock;
+	}
+
+	public int getMinTime() {
+		return minTime;
+	}
+
+	public int getMaxTime() {
+		return maxTime;
+	}
+
+	public long getMaxRpid() {
+		return maxRpid;
+	}
 
 }

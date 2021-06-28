@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@MapperScan("net.yunyi.back.persistence.mapper")
+//@MapperScan("asia.asoulcnki.api.persistence.mapper")
 @EnableTransactionManagement
 public class MybatisPlusConfig {
 

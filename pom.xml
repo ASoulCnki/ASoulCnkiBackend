@@ -24,6 +24,11 @@
             <groupId>org.springframework.boot</groupId>
         </dependency>
         <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo-shaded</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+        <dependency>
             <artifactId>spring-boot-starter-test</artifactId>
             <groupId>org.springframework.boot</groupId>
             <scope>test</scope>

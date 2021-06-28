@@ -1,31 +1,43 @@
 package asia.asoulcnki.api.persistence.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class Reply {
-
+public class Reply implements Serializable {
+	private static final long serialVersionUID = 6554064566476229771L;
 
 	@TableId(value = "rpid")
-	private long rpid;
+	@JsonProperty("rpid")
+	private Long rpid;
 
+	@JsonProperty("type_id")
 	private int typeId;
 
+	@JsonProperty("dynamic_id")
 	private long dynamicId;
 
+	@JsonProperty("mid")
 	private int mid;
 
+	@JsonProperty("oid")
 	private long oid;
 
+	@JsonProperty("ctime")
 	private int ctime;
 
+	@JsonProperty("m_name")
 	private String mName;
 
+	@JsonProperty("content")
 	private String content;
 
-	private int like_num;
+	@JsonProperty("like_num")
+	private int likeNum;
 
 }

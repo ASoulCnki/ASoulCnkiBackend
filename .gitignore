@@ -13,6 +13,7 @@ target/
 logs/
 .mvn/
 
-database.dat
+/data/database.dat
+/data/bilibili_cnki_reply.json
 /src/main/resources/application-dev.yml
 /src/main/resources/application-pro.yml
