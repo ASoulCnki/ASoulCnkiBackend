@@ -7,6 +7,11 @@ import java.util.Set;
 
 public class SummaryHash {
 
+	public static final int DEFAULT_K = 8;
+	public static final int DEFAULT_W = 8;
+	private static final long DEFAULT_Q = 1145141919780L;
+	private static final int DEFAULT_B = 2;
+
 	private static Tuple<Long, Integer> hashValue(String s, int nextStartOffset, int k, long q, int b) {
 		BigInteger hash = BigInteger.valueOf(0);
 		int offset = nextStartOffset;
@@ -40,7 +45,7 @@ public class SummaryHash {
 	public static ArrayList<Long> hash(String s, int k, long q, int b, int w) {
 		ArrayList<Long> hashVals = getStringHashVals(s, k, q, b);
 
-		ArrayList<Long> hashPicks = new ArrayList<>();
+		ArrayList<Long> hashPicks = new ArrayList<>(hashVals.size());
 		hashPicks.add(pickHash(hashVals, 0, w));
 		int j = 1;
 		while (j + w <= hashVals.size()) {
@@ -82,6 +87,7 @@ public class SummaryHash {
 		return hashVals;
 	}
 
+	// start = index, end = index + w
 	private static long pickHash(ArrayList<Long> hashVals, int start, int end) {
 		int index = start;
 		long minHash = Long.MAX_VALUE;
@@ -95,9 +101,9 @@ public class SummaryHash {
 	}
 
 	public static float compareArticle(String article1, String article2) {
-		int k = 4;
-		long q = 1145141919780L; // 😅
-		int b = 2;
+		int k = DEFAULT_K;
+		long q = DEFAULT_Q; // 😅
+		int b = DEFAULT_B;
 
 		Set<Integer> redList = new HashSet<>();
 
@@ -123,16 +129,21 @@ public class SummaryHash {
 		return count / (float) codePointsCount;
 	}
 
+	// TODO w 的 长度 和 k 的长度
+	// 找评论区里表现不太好的查重结果
+	// 去掉空格和回车，标点符号之后再计算hash值
 	public static ArrayList<Long> defaultHash(String s) {
-		return hash(s, 4, 1145141919780L, 2, 4);
+		return hash(s, DEFAULT_K, DEFAULT_Q, DEFAULT_B, DEFAULT_W);
 	}
 
 	public static void main(String[] args) {
-		String text1 = "嘉然的脚小小的香香的，不像手经常使用来得灵活，但有一种独特的可爱的笨拙，嫩嫩的脚丫光滑细腻，凌莹剔透，看得见皮肤下面细细的血管与指甲之下粉白的月牙。再高冷的女生小脚也是敏感的害羞的，轻轻挠一挠，她就摇身一变成为娇滴滴的女孩，脚丫像是一把钥匙，轻轻掌握它就能打开女孩子的心灵。";
-		String text2 = "嘉然的脚小小的香香的,不像手经常使用来得灵活,但有一种独特的可爱的笨拙,嫩嫩的脚丫光滑细腻，凌莹剔透,看得见皮肤下面细细的血管与指甲之下粉白的月牙再高冷的女生小脚也是敏感的害羞的，轻轻挠一挠，她就摇身一变成为娇滴滴的女孩,脚丫像是一把钥匙，轻轻掌握它就能打开女孩子的心灵。";
-		ArrayList<Long> result1 = hash(text1, 4, 1145141919780L, 2, 4);
+		String text1 =
+				"嘉然的脚小小的香香的，不像手经常使用来得灵活，但有一种独特的可爱的笨拙，嫩嫩的脚丫光滑细腻，凌莹剔透，看得见皮肤下面细细的血管与指甲之下粉白的月牙。再高冷的女生小脚也是敏感的害羞的，轻轻挠一挠，她就摇身一变成为娇滴滴的女孩，脚丫像是一把钥匙，轻轻掌握它就能打开女孩子的心灵。";
+		String text2 = "嘉然的脚小小的香香的,不像手经常使用来得灵活,但有一种独特的可爱的笨拙,嫩嫩的脚丫光滑细腻，凌莹剔透," +
+				"看得见皮肤下面细细的血管与指甲之下粉白的月牙再高冷的女生小脚也是敏感的害羞的，轻轻挠一挠，她就摇身一变成为娇滴滴的女孩,脚丫像是一把钥匙，轻轻掌握它就能打开女孩子的心灵。";
+		ArrayList<Long> result1 = defaultHash(text1);
 		System.out.println(result1);
-		ArrayList<Long> result2 = hash(text2, 4, 1145141919780L, 2, 4);
+		ArrayList<Long> result2 = defaultHash(text2);
 		System.out.println(result2);
 		System.out.println(compareArticle(text1, text2));
 		System.out.println(compareArticle(text2, text2));
