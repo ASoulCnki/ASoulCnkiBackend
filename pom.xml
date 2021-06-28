@@ -42,8 +42,6 @@
             <groupId>org.projectlombok</groupId>
             <optional>true</optional>
         </dependency>
-
-
         <dependency>
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <groupId>com.baomidou</groupId>
@@ -101,12 +99,6 @@
         </dependency>
 
         <dependency>
-            <artifactId>jjwt</artifactId>
-            <groupId>io.jsonwebtoken</groupId>
-            <scope>compile</scope>
-            <version>0.9.1</version>
-        </dependency>
-        <dependency>
             <artifactId>spring-boot-starter-redis</artifactId>
             <exclusions>
                 <exclusion>
@@ -120,17 +112,6 @@
         <dependency>
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <groupId>org.springframework.boot</groupId>
-        </dependency>
-        <dependency>
-            <artifactId>gson</artifactId>
-            <groupId>com.google.code.gson</groupId>
-            <scope>compile</scope>
-            <version>2.8.6</version>
-        </dependency>
-        <dependency>
-            <artifactId>tencentcloud-sdk-java</artifactId>
-            <groupId>com.tencentcloudapi</groupId>
-            <version>3.1.62</version><!-- 注：这里只是示例版本号，请获取并替换为 最新的版本号 -->
         </dependency>
         <dependency>
             <artifactId>hibernate-validator</artifactId>

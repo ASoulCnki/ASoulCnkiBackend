@@ -109,7 +109,7 @@ public class ComparisonDatabase {
 		if (reply == null || replyMap.containsKey(reply.getRpid())) {
 			return;
 		}
-		if (reply.getContent().codePointCount(0, reply.getContent().length()) < 4) {
+		if (reply.getContent().codePointCount(0, reply.getContent().length()) < SummaryHash.DEFAULT_K) {
 			return;
 		}
 		this.replyMap.put(reply.getRpid(), reply);

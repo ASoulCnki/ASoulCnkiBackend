@@ -46,7 +46,7 @@ public class CheckServiceImpl implements ICheckService {
 
 		List<List<Object>> related = new ArrayList<>(10);
 
-		float threshHold = (float) ((codePointCount - 4) * 0.3);
+		float threshHold = (float) ((float) textHashList.size() * 0.2);
 		Comparator<Map.Entry<Long, Integer>> cmp = Map.Entry.comparingByValue();
 		List<Map.Entry<Long, Integer>> sortedList =
 				replyHitMap.entrySet().stream().filter(entry -> entry.getValue() > threshHold).sorted(cmp.reversed()).collect(Collectors.toList());
