@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/check")
 @Validated
@@ -21,7 +23,7 @@ public class CheckController {
 
 	@PostMapping
 	@ResponseBody
-	public ApiResult<CheckResultVo> checkReplyDuplication(@RequestBody CheckReplyParam param) {
+	public ApiResult<CheckResultVo> checkReplyDuplication(@RequestBody @Valid CheckReplyParam param) {
 		return ApiResult.ok(checkService.check(param.getText()));
 	}
 }

@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
+@ToString
 public class Reply implements Serializable {
 	private static final long serialVersionUID = 6554064566476229771L;
 

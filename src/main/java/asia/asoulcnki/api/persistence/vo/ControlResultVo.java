@@ -5,19 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CheckResultVo {
-	@JsonProperty("rate")
-	public float allSimilarity;
+public class ControlResultVo {
 	@JsonProperty("start_time")
 	private int startTime;
+
 	@JsonProperty("end_time")
 	private int endTime;
-	@JsonProperty("related")
-	private List<List<Object>> related;
-
 }

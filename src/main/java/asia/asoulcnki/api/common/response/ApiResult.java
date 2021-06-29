@@ -17,7 +17,7 @@ public class ApiResult<T> {
 	/**
 	 * 响应结果
 	 */
-	private T result;
+	private T data;
 
 	public ApiResult() {
 	}
@@ -46,7 +46,7 @@ public class ApiResult<T> {
 		ApiResult<T> rb = new ApiResult<>();
 		rb.setCode(CnkiCommonEnum.SUCCESS.getResultCode());
 		rb.setMessage(CnkiCommonEnum.SUCCESS.getResultMsg());
-		rb.setResult(data);
+		rb.setData(data);
 		return rb;
 	}
 
@@ -57,7 +57,7 @@ public class ApiResult<T> {
 		ApiResult<T> rb = new ApiResult<>();
 		rb.setCode(errorInfo.getResultCode());
 		rb.setMessage(errorInfo.getResultMsg());
-		rb.setResult(null);
+		rb.setData(null);
 		return rb;
 	}
 
@@ -68,7 +68,14 @@ public class ApiResult<T> {
 		ApiResult<T> rb = new ApiResult<>();
 		rb.setCode(code);
 		rb.setMessage(message);
-		rb.setResult(null);
+		rb.setData(null);
+		return rb;
+	}
+
+	public static <T> ApiResult<T> error(int code) {
+		ApiResult<T> rb = new ApiResult<>();
+		rb.setCode(code);
+		rb.setData(null);
 		return rb;
 	}
 
@@ -79,7 +86,7 @@ public class ApiResult<T> {
 		ApiResult<T> rb = new ApiResult<>();
 		rb.setCode(-1);
 		rb.setMessage(message);
-		rb.setResult(null);
+		rb.setData(null);
 		return rb;
 	}
 
@@ -99,12 +106,12 @@ public class ApiResult<T> {
 		this.message = message;
 	}
 
-	public T getResult() {
-		return result;
+	public T getData() {
+		return data;
 	}
 
-	public void setResult(T result) {
-		this.result = result;
+	public void setData(T data) {
+		this.data = data;
 	}
 
 	@Override

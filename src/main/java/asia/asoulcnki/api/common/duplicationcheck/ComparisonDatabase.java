@@ -76,11 +76,11 @@ public class ComparisonDatabase {
 		this.rwLock.readLock().unlock();
 	}
 
-	private void writeLock() {
+	public void writeLock() {
 		this.rwLock.writeLock().lock();
 	}
 
-	private void writeUnLock() {
+	public void writeUnLock() {
 		this.rwLock.writeLock().unlock();
 	}
 
@@ -92,7 +92,7 @@ public class ComparisonDatabase {
 		output.close();
 	}
 
-	private void reset() {
+	public void reset() {
 		this.writeLock();
 		try {
 			this.maxRpid = 0;

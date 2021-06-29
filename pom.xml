@@ -98,26 +98,36 @@
             <version>1.2.41</version>
         </dependency>
 
+        <!-- 处理配置 -->
         <dependency>
-            <artifactId>spring-boot-starter-redis</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>lettuce-core</artifactId>
-                    <groupId>io.lettuce</groupId>
-                </exclusion>
-            </exclusions>
             <groupId>org.springframework.boot</groupId>
-            <version>1.3.5.RELEASE</version>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
-        <dependency>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-            <groupId>org.springframework.boot</groupId>
-        </dependency>
+
+        <!-- 数据校验依赖 -->
         <dependency>
             <artifactId>hibernate-validator</artifactId>
             <groupId>org.hibernate.validator</groupId>
             <version>6.0.17.Final</version>
         </dependency>
+
+        <!-- Redis 缓存依赖 -->
+        <dependency>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <groupId>org.springframework.boot</groupId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+        <!-- caffeine 缓存依赖 -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
     </dependencies>
 
 
@@ -132,8 +142,7 @@
     <properties>
         <commons-lang3.version>3.4</commons-lang3.version>
         <druid-version>1.1.5</druid-version>
-        <guava.version>18.0</guava.version>
-        <guava.version>18.0</guava.version>
+        <guava.version>19.0</guava.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <mysql-connector-java.version>8.0.21</mysql-connector-java.version>

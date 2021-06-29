@@ -9,6 +9,10 @@ import asia.asoulcnki.api.persistence.service.ICheckService;
 import asia.asoulcnki.api.persistence.vo.CheckResultVo;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,17 +23,21 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@CacheConfig(cacheNames = "caffeineCacheManager")
 public class CheckServiceImpl implements ICheckService {
+	private final static Logger log = LoggerFactory.getLogger(CheckServiceImpl.class);
+
 	@Override
+	@Cacheable(key = "#text", value = "replyCache")
 	public CheckResultVo check(final String text) {
 		int codePointCount = text.codePointCount(0, text.length());
 		if (codePointCount > 1000) {
+			log.error("the text to check is too long, codepoint number {} ", codePointCount);
 			throw new BizException(CnkiCommonEnum.TEXT_TO_CHECK_TOO_LONG);
 		}
 		// TODO add cache support
 		return getDuplicationCheckResult(text);
 	}
-
 
 	private CheckResultVo getDuplicationCheckResult(String text) {
 		ComparisonDatabase db = ComparisonDatabase.getInstance();
@@ -51,7 +59,7 @@ public class CheckServiceImpl implements ICheckService {
 			}
 		}
 
-		List<List<Object>> related = new ArrayList<>(10);
+		List<List<Object>> related = new ArrayList<>(textHashList.size() / 2);
 
 		float threshHold = (float) ((float) textHashList.size() * 0.2);
 		Comparator<Map.Entry<Long, Integer>> cmp = Map.Entry.comparingByValue();
@@ -72,16 +80,16 @@ public class CheckServiceImpl implements ICheckService {
 		related.sort((lhs, rhs) -> {
 			float lhsSimilarity = (float) lhs.get(0);
 			float rhsSimilarity = (float) rhs.get(0);
-
 			if (lhsSimilarity != rhsSimilarity) {
-				return (int) (lhsSimilarity - rhsSimilarity);
+				if (lhsSimilarity > rhsSimilarity) {
+					return -1;
+				} else {
+					return 1;
+				}
 			}
-
 			int lhsCTime = ((Reply) lhs.get(1)).getCtime();
 			int rhsCTime = ((Reply) rhs.get(1)).getCtime();
-
-			return lhsCTime - rhsCTime;
-
+			return Integer.compare(lhsCTime, rhsCTime);
 		});
 
 		float allSimilarity = 0;
