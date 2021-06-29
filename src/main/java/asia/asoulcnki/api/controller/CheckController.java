@@ -22,6 +22,6 @@ public class CheckController {
 	@PostMapping
 	@ResponseBody
 	public ApiResult<CheckResultVo> checkReplyDuplication(@RequestBody CheckReplyParam param) {
-		return checkService.check(param.getText());
+		return ApiResult.ok(checkService.check(param.getText()));
 	}
 }

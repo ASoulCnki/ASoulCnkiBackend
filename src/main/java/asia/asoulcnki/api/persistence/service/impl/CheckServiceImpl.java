@@ -1,8 +1,9 @@
 package asia.asoulcnki.api.persistence.service.impl;
 
+import asia.asoulcnki.api.common.BizException;
 import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
 import asia.asoulcnki.api.common.duplicationcheck.SummaryHash;
-import asia.asoulcnki.api.common.response.ApiResult;
+import asia.asoulcnki.api.common.response.CnkiCommonEnum;
 import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.service.ICheckService;
 import asia.asoulcnki.api.persistence.vo.CheckResultVo;
@@ -20,15 +21,21 @@ import java.util.stream.Collectors;
 @Service
 public class CheckServiceImpl implements ICheckService {
 	@Override
-	public ApiResult<CheckResultVo> check(final String text) {
-		ArrayList<Long> textHashList = SummaryHash.defaultHash(text);
-		Map<Long, Integer> replyHitMap = new HashMap<>();
+	public CheckResultVo check(final String text) {
 		int codePointCount = text.codePointCount(0, text.length());
 		if (codePointCount > 1000) {
-			return ApiResult.error(400, "text too long");
+			throw new BizException(CnkiCommonEnum.TEXT_TO_CHECK_TOO_LONG);
 		}
+		// TODO add cache support
+		return getDuplicationCheckResult(text);
+	}
 
+
+	private CheckResultVo getDuplicationCheckResult(String text) {
 		ComparisonDatabase db = ComparisonDatabase.getInstance();
+
+		ArrayList<Long> textHashList = SummaryHash.defaultHash(text);
+		Map<Long, Integer> replyHitMap = new HashMap<>();
 
 		for (Long textHash : textHashList) {
 			ArrayList<Long> hitReplyIds = db.searchHash(textHash);
@@ -93,8 +100,7 @@ public class CheckServiceImpl implements ICheckService {
 		} else {
 			vo.setRelated(related);
 		}
-
-		return ApiResult.ok(vo);
+		return vo;
 	}
 
 	private String getReplyUrl(Reply reply) {
