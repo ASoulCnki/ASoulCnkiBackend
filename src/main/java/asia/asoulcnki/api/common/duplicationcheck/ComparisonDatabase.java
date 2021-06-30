@@ -36,8 +36,8 @@ public class ComparisonDatabase {
 		this.minTime = Integer.MAX_VALUE;
 		this.maxTime = 0;
 		this.rwLock = new ReentrantReadWriteLock();
-		this.replyMap = new HashMap<>();
-		this.textHashMap = new HashMap<>();
+		this.replyMap = new HashMap<>(70 * 10000);
+		this.textHashMap = new HashMap<>(70 * 100000);
 	}
 
 	public static synchronized ComparisonDatabase getInstance() {
@@ -50,6 +50,7 @@ public class ComparisonDatabase {
 						instance = loadFromImage(DEFAULT_IMAGE_PATH);
 						log.info("load database cost {} ms", System.currentTimeMillis() - start);
 					} catch (Exception e) {
+						e.printStackTrace();
 						instance = new ComparisonDatabase();
 					}
 					instance.rwLock = new ReentrantReadWriteLock();
@@ -59,11 +60,27 @@ public class ComparisonDatabase {
 		return instance;
 	}
 
+	static void printMemory() {
+		log.info("max memory {}", mb(Runtime.getRuntime().maxMemory()));
+		log.info("total memory {}", mb(Runtime.getRuntime().totalMemory()));
+		log.info("free memory {}", mb(Runtime.getRuntime().freeMemory()));
+	}
+
+	static String mb(long s) {
+		return String.format("%d (%.2f M)", s, (double) s / (1024 * 1024));
+	}
+
 	private static ComparisonDatabase loadFromImage(String path) throws IOException {
 		Kryo kryo = new Kryo();
 		File file = new File(path);
-		Input input = new Input(new FileInputStream(file));
+		log.info("before alloc buffer");
+		printMemory();
+		Input input = new Input(new FileInputStream(file), 1024 * 1000 * 100);
+		log.info("after alloc buffer");
+		printMemory();
 		ComparisonDatabase db = kryo.readObject(input, ComparisonDatabase.class);
+		log.info("after de-serialize");
+		printMemory();
 		input.close();
 		return db;
 	}
@@ -98,8 +115,8 @@ public class ComparisonDatabase {
 			this.maxRpid = 0;
 			this.minTime = Integer.MAX_VALUE;
 			this.maxTime = 0;
-			this.replyMap = new HashMap<>();
-			this.textHashMap = new HashMap<>();
+			this.replyMap = new HashMap<>(70 * 10000);
+			this.textHashMap = new HashMap<>(70 * 10000);
 		} finally {
 			this.writeUnLock();
 		}
