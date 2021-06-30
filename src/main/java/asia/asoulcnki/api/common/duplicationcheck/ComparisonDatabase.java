@@ -37,7 +37,7 @@ public class ComparisonDatabase {
 		this.maxTime = 0;
 		this.rwLock = new ReentrantReadWriteLock();
 		this.replyMap = new HashMap<>(70 * 10000);
-		this.textHashMap = new HashMap<>(70 * 100000);
+		this.textHashMap = new HashMap<>(70 * 10000);
 	}
 
 	public static synchronized ComparisonDatabase getInstance() {

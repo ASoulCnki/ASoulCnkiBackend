@@ -1,9 +1,7 @@
 package asia.asoulcnki.api.persistence.service.impl;
 
-import asia.asoulcnki.api.common.BizException;
 import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
 import asia.asoulcnki.api.common.duplicationcheck.SummaryHash;
-import asia.asoulcnki.api.common.response.CnkiCommonEnum;
 import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.service.ICheckService;
 import asia.asoulcnki.api.persistence.vo.CheckResultVo;
@@ -30,12 +28,11 @@ public class CheckServiceImpl implements ICheckService {
 	@Override
 	@Cacheable(key = "#text", value = "replyCache")
 	public CheckResultVo check(final String text) {
-		int codePointCount = text.codePointCount(0, text.length());
-		if (codePointCount > 1000) {
-			log.error("the text to check is too long, codepoint number {} ", codePointCount);
-			throw new BizException(CnkiCommonEnum.TEXT_TO_CHECK_TOO_LONG);
-		}
-		// TODO add cache support
+//		int codePointCount = text.codePointCount(0, text.length());
+//		if (codePointCount > 1000) {
+//			log.error("the text to check is too long, codepoint number {} ", codePointCount);
+//			throw new BizException(CnkiCommonEnum.TEXT_TO_CHECK_TOO_LONG);
+//		}
 		return getDuplicationCheckResult(text);
 	}
 
