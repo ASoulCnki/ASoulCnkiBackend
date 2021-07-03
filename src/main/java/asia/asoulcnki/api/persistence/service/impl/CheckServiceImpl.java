@@ -25,14 +25,18 @@ import java.util.stream.Collectors;
 public class CheckServiceImpl implements ICheckService {
 	private final static Logger log = LoggerFactory.getLogger(CheckServiceImpl.class);
 
+	private static boolean isHighSimilarity(float similarity) {
+		return similarity > 0.8;
+	}
+
 	@Override
 	@Cacheable(key = "#text", value = "replyCache")
 	public CheckResultVo check(final String text) {
-//		int codePointCount = text.codePointCount(0, text.length());
-//		if (codePointCount > 1000) {
-//			log.error("the text to check is too long, codepoint number {} ", codePointCount);
-//			throw new BizException(CnkiCommonEnum.TEXT_TO_CHECK_TOO_LONG);
-//		}
+		//		int codePointCount = text.codePointCount(0, text.length());
+		//		if (codePointCount > 1000) {
+		//			log.error("the text to check is too long, codepoint number {} ", codePointCount);
+		//			throw new BizException(CnkiCommonEnum.TEXT_TO_CHECK_TOO_LONG);
+		//		}
 		return getDuplicationCheckResult(text);
 	}
 
@@ -56,6 +60,7 @@ public class CheckServiceImpl implements ICheckService {
 			}
 		}
 
+		// TODO refactor related item to a pojo
 		List<List<Object>> related = new ArrayList<>(textHashList.size() / 2);
 
 		float threshHold = (float) ((float) textHashList.size() * 0.2);
@@ -68,25 +73,33 @@ public class CheckServiceImpl implements ICheckService {
 		for (Map.Entry<Long, Integer> entry : sortedList) {
 			Reply reply = db.getReply(entry.getKey());
 			String content = reply.getContent();
-			allContentBuilder.append(content);
 			float similarity = SummaryHash.compareArticle(text, content);
+			if (similarity < 0.2) {
+				continue;
+			}
 			String replyUrl = getReplyUrl(reply);
+			allContentBuilder.append(content);
 			related.add(Lists.newArrayList(similarity, reply, replyUrl));
 		}
 
+		// param -> left hand side and right hand side
 		related.sort((lhs, rhs) -> {
 			float lhsSimilarity = (float) lhs.get(0);
-			float rhsSimilarity = (float) rhs.get(0);
-			if (lhsSimilarity != rhsSimilarity) {
-				if (lhsSimilarity > rhsSimilarity) {
-					return -1;
-				} else {
-					return 1;
-				}
-			}
 			int lhsCTime = ((Reply) lhs.get(1)).getCtime();
+
+			float rhsSimilarity = (float) rhs.get(0);
 			int rhsCTime = ((Reply) rhs.get(1)).getCtime();
-			return Integer.compare(lhsCTime, rhsCTime);
+
+			// if two reply are both highly similar with query text, decided by ctime and return
+			if (isHighSimilarity(lhsSimilarity) && isHighSimilarity(rhsSimilarity)) {
+				return Integer.compare(lhsCTime, rhsCTime);
+			}
+
+			if (lhsSimilarity != rhsSimilarity) {
+				return -Float.compare(lhsSimilarity, rhsSimilarity);
+			} else {
+				return Integer.compare(lhsCTime, rhsCTime);
+			}
 		});
 
 		float allSimilarity = 0;
