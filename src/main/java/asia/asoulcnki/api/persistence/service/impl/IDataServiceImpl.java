@@ -8,6 +8,9 @@ import asia.asoulcnki.api.persistence.service.IDataService;
 import asia.asoulcnki.api.persistence.service.IReplyService;
 import asia.asoulcnki.api.persistence.vo.ControlResultVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -25,6 +30,17 @@ public class IDataServiceImpl implements IDataService {
 	@Autowired
 	IReplyService IReplyService;
 
+	public static List<Reply> getJsonFile(String path) {
+		ObjectMapper objMapper = new ObjectMapper();
+		objMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		try {
+			JavaType javaType = objMapper.getTypeFactory().constructCollectionType(List.class, Reply.class);
+			return objMapper.readValue(new File(path), javaType);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	@Cacheable(key = "#startTime", value = "defaultCache")
 	public long getStartRpid(int startTime) {
@@ -108,6 +124,26 @@ public class IDataServiceImpl implements IDataService {
 		ComparisonDatabase db = ComparisonDatabase.getInstance();
 		try {
 			db.reset();
+		} catch (Exception e) {
+			throw new BizException(CnkiCommonEnum.INTERNAL_SERVER_ERROR, e);
+		}
+		return checkpoint();
+	}
+
+	@Override
+	@CacheEvict(value = "replyCache", allEntries = true)
+	public ControlResultVo train() {
+		try {
+			long start = System.currentTimeMillis();
+			List<Reply> node = getJsonFile("data/bilibili_cnki_reply.json");
+			if (node == null) {
+				throw new BizException(CnkiCommonEnum.INTERNAL_SERVER_ERROR);
+			}
+			ComparisonDatabase db = ComparisonDatabase.getInstance();
+			for (Reply reply : node) {
+				db.addReplyData(reply);
+			}
+			log.info("train end cost {} ms", System.currentTimeMillis() - start);
 		} catch (Exception e) {
 			throw new BizException(CnkiCommonEnum.INTERNAL_SERVER_ERROR, e);
 		}

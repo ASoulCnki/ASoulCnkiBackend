@@ -48,6 +48,14 @@ public class DataController {
 		return ApiResult.ok(dataService.reset());
 	}
 
+	@PostMapping("/train")
+	@ResponseBody
+	public ApiResult<ControlResultVo> train(@RequestBody ControlParam param) {
+		checkSecureKey(param.getSecureKey());
+		return ApiResult.ok(dataService.train());
+	}
+
+
 	@PostMapping("/checkpoint")
 	@ResponseBody
 	public ApiResult<ControlResultVo> checkpoint(@RequestBody ControlParam param) {

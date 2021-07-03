@@ -8,4 +8,6 @@ public interface IDataService {
 	ControlResultVo checkpoint();
 
 	ControlResultVo reset();
+
+	ControlResultVo train();
 }

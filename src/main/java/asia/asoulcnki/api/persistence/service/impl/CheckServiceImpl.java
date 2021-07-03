@@ -25,8 +25,14 @@ import java.util.stream.Collectors;
 public class CheckServiceImpl implements ICheckService {
 	private final static Logger log = LoggerFactory.getLogger(CheckServiceImpl.class);
 
-	private static boolean isHighSimilarity(float similarity) {
-		return similarity > 0.8;
+	private static boolean isHighSimilarity(int textLength, float similarity) {
+		if (textLength > 250) {
+			return similarity > 0.6;
+		} else if (textLength > 150) {
+			return similarity > 0.7;
+		} else {
+			return similarity > 0.8;
+		}
 	}
 
 	@Override
@@ -82,6 +88,7 @@ public class CheckServiceImpl implements ICheckService {
 			related.add(Lists.newArrayList(similarity, reply, replyUrl));
 		}
 
+		int textLength = text.codePointCount(0, text.length());
 		// param -> left hand side and right hand side
 		related.sort((lhs, rhs) -> {
 			float lhsSimilarity = (float) lhs.get(0);
@@ -90,8 +97,7 @@ public class CheckServiceImpl implements ICheckService {
 			float rhsSimilarity = (float) rhs.get(0);
 			int rhsCTime = ((Reply) rhs.get(1)).getCtime();
 
-			// if two reply are both highly similar with query text, decided by ctime and return
-			if (isHighSimilarity(lhsSimilarity) && isHighSimilarity(rhsSimilarity)) {
+			if (isHighSimilarity(textLength, lhsSimilarity) && isHighSimilarity(textLength, rhsSimilarity)) {
 				return Integer.compare(lhsCTime, rhsCTime);
 			}
 
