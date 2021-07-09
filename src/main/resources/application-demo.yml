@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/bilibili_cnki?useUnicode=true&character_set_server=utf8mb4
+    username: root
+    password: 123456
+  cache:
+    type: caffeine
+
+  redis:
+    database: 0
+    port: 6379
+    host: localhost
+    password: 1234
+    jedis:
+      pool:
+        max-active: 4
+        max-wait: -1
+        max-idle: 4
+        min-idle: 0 # 最小的空闲连接数
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+
+logging:
+  config: classpath:logback-spring.xml
+  pattern:
+    console: "%date [%level] [%thread] %logger{60} [%file : %line] %msg%n"
+    file: "%date [%level] [%thread] %logger{60} [%file : %line] %msg%n"
+  level:
+    root: info
+  file:
+    path: logs/
+    name: default.log
+server:
+  port: 8000
+  servlet:
+    context-path: /v1/api
+
+secure:
+  key: 123456
