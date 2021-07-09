@@ -4,14 +4,23 @@
 源项目：https://github.com/stream2000/ASoulCnki
 网站地址：https://asoulcnki.asia
 
-## 本地部署方式
-
-1. 设置数据库并修改application-demo.yml中的数据库地址为对应的数据库。
-
-2. 设置redis并修改application-demo.yml中的redis地址为对应的地址。 
-
-3. 下载数据文件（可以联系项目管理者获取）
-
-4. 启动应用并使用Train Api将数据导入内存中。 
-
-5. 使用nginx或其他方式启动代理前端文件，即可访问网站。当然这不是必须的，可以直接用postman之类的工具访问api。 
+## 部署
+### 1 系统要求
+1. Java 8
+2. Java堆内存1500M及其以上
+### 2 运行
+#### 2.1 依赖json文件运行  
+1. 修改application-demo.yml中的secure.key
+2. 将bilibili_cnki_reply.json放入data文件夹(json数据文件可以联系项目管理者获取)  
+3. 运行springboot后端
+4. 调用后端train接口训练数据 训练需要较长时间(约一分钟)  
+示例请求(python):
+```python
+import requests
+CONTROL_SECURE_KEY = "123456" #注意修改为application-demo.yml中的secure.key
+base_url = "http://localhost:8000/v1/api/data/train"
+r = requests.post(base_url, json={'secure_key': CONTROL_SECURE_KEY, 'start_time': 0})
+print(r.json())
+```
+#### 2.2 依赖数据库运行  
+TODO
