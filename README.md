@@ -34,7 +34,7 @@ print(r.json())
 
 ```shell
 sh bin/start.sh # 启动docker
-sh bin/do_setup.sh # 初始化数据库
+sh bin/do_setup.sh # 初始化数据库, 需要等待mysql初始化完成，约10s
 ```
 
 如果想清理数据文件, 执行下面命令即可

@@ -17,6 +17,6 @@ logs/
 /data/bilibili_cnki_reply.json
 /src/main/resources/application-dev.yml
 /src/main/resources/application-pro.yml
-/docker/mysql/data
-/docker/redis/data
+bin/docker/mysql/data
+bin/docker/redis/data
 sync.sh

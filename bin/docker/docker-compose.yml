@@ -14,7 +14,7 @@ services:
       - ./mysql/my.cnf:/etc/mysql/my.cnf # 映射数据库配置文件
       - ./mysql/conf.d:/etc/mysql/conf.d # 映射数据库配置文件
       - ../sql:/etc/mysql/sql # 映射数据文件
-      - ../bin:/etc/mysql/bin # 映射数据文件
+      - ..:/etc/mysql/bin # 映射数据文件
     ports:
       - "3388:3306"
 

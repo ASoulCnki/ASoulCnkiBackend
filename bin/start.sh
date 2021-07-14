@@ -1,2 +1,1 @@
-cp -r docker/* /etc/docker/
-docker compose -f docker/docker-compose.yml up -d
+docker compose -f bin/docker/docker-compose.yml up -d
