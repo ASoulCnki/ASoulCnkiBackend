@@ -6,11 +6,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Component;
+import springfox.documentation.oas.annotations.EnableOpenApi;
 
 import javax.annotation.PostConstruct;
 
 @SpringBootApplication
 @EnableCaching
+@EnableOpenApi
 @MapperScan("asia.asoulcnki.api.persistence.mapper")
 public class ApiApplication {
 
