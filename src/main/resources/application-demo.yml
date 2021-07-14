@@ -3,9 +3,12 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/bilibili_cnki?useUnicode=true&character_set_server=utf8mb4
     username: root
-    password: 123456
+    password: root
   cache:
     type: caffeine
+
+  application:
+    name: AsoulCnki
 
   redis:
     database: 0
@@ -36,6 +39,13 @@ server:
   port: 8000
   servlet:
     context-path: /v1/api
+application:
+  name: AsoulCnki
+  version: 1.0
+  description: 枝网查重后台
 
 secure:
   key: 123456
+
+swagger:
+  enabled: false
