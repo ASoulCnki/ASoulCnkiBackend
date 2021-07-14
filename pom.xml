@@ -8,14 +8,26 @@
     <artifactId>api</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <groupId>org.springframework.boot</groupId>
-            </plugin>
-        </plugins>
-    </build>
+    <parent>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <groupId>org.springframework.boot</groupId>
+        <relativePath/>
+        <version>2.3.4.RELEASE</version> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <commons-lang3.version>3.4</commons-lang3.version>
+        <druid-version>1.1.5</druid-version>
+        <guava.version>19.0</guava.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <mysql-connector-java.version>8.0.21</mysql-connector-java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <slf4j-api.version>1.7.25</slf4j-api.version>
+        <springfox-swagger2.version>3.0.0</springfox-swagger2.version>
+        <docker.image.prefix>asoulcnki</docker.image.prefix>
+        <dockerfile-maven-plugin.version>1.4.7</dockerfile-maven-plugin.version>
+    </properties>
 
 
     <dependencies>
@@ -131,24 +143,29 @@
     </dependencies>
 
 
-    <parent>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <groupId>org.springframework.boot</groupId>
-        <relativePath/>
-        <version>2.3.4.RELEASE</version> <!-- lookup parent from repository -->
-    </parent>
-
-
-    <properties>
-        <commons-lang3.version>3.4</commons-lang3.version>
-        <druid-version>1.1.5</druid-version>
-        <guava.version>19.0</guava.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <mysql-connector-java.version>8.0.21</mysql-connector-java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <slf4j-api.version>1.7.25</slf4j-api.version>
-        <springfox-swagger2.version>3.0.0</springfox-swagger2.version>
-    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.springframework.boot</groupId>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.4.13</version>
+                <configuration>
+                    <imageName>${project.name}:${project.version}</imageName>
+                    <dockerDirectory>src/main/docker</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

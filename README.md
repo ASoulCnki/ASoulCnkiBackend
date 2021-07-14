@@ -44,3 +44,11 @@ sh bin/cleanup.sh
 ```
 
 在初始化数据库完成后，启动项目，可以按照2.1的方式训练数据，也可以参照api文档从数据库拉取数据来训练
+
+
+#### 2.3 使用docker运行
+
+```shell
+mvn clean package docker:build # 构建镜像
+docker run api:1.0-SNAPSHOT # 启动docker
+```
