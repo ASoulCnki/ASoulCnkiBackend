@@ -17,8 +17,7 @@ import springfox.documentation.spring.web.plugins.Docket;
  Springfox-swagger 3.0.0配置
 
  *
- * @author lilinhai
- * @since 2020-07-13 10:46
+ * @author rmym
  * @version V1.0
  */
 @Configuration
