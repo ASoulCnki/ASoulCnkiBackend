@@ -1,0 +1,33 @@
+version: '3'
+services:
+  mysql:
+    hostname: mysql8
+    image: mysql:8
+    # network_mode: "host" # 如果需要容器使用宿主机IP(内网IP)，则可以配置此项
+    container_name: mysql8 # 指定容器名称，如果不设置此参数，则由系统自动生成
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci # 设置utf8字符集
+    environment:
+      - TZ=Asia/Shanghai # 设置容器时区与宿主机保持一致
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./mysql/data:/var/lib/mysql # 映射数据库保存目录到宿主机，防止数据丢失
+      - ./mysql/my.cnf:/etc/mysql/my.cnf # 映射数据库配置文件
+      - ./mysql/conf.d:/etc/mysql/conf.d # 映射数据库配置文件
+      - ../sql:/etc/mysql/sql # 映射数据文件
+      - ../bin:/etc/mysql/bin # 映射数据文件
+    ports:
+      - "3388:3306"
+
+  redis:
+    hostname: redis
+    image: redis:5.0.0
+    container_name: redis
+    restart: always
+    command: redis-server /etc/redis.conf # 启动redis命令
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./redis/data:/data
+      - ./redis/redis.conf:/etc/redis.conf
+    ports:
+      - "6399:6379"

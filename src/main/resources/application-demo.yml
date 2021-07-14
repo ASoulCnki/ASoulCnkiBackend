@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/bilibili_cnki?useUnicode=true&character_set_server=utf8mb4
+    url: jdbc:mysql://0.0.0.0:3388/bilibili_cnki?useUnicode=true&character_set_server=utf8mb4
     username: root
     password: root
   cache:
@@ -12,8 +12,8 @@ spring:
 
   redis:
     database: 0
-    port: 6379
-    host: localhost
+    port: 6399
+    host: 0.0.0.0
     password: 1234
     jedis:
       pool:
@@ -48,4 +48,4 @@ secure:
   key: 123456
 
 swagger:
-  enabled: false
+  enabled: true

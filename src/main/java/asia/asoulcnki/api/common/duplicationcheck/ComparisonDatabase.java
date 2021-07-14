@@ -50,7 +50,6 @@ public class ComparisonDatabase {
 						instance = loadFromImage(DEFAULT_IMAGE_PATH);
 						log.info("load database cost {} ms", System.currentTimeMillis() - start);
 					} catch (Exception e) {
-						e.printStackTrace();
 						instance = new ComparisonDatabase();
 					}
 					instance.rwLock = new ReentrantReadWriteLock();

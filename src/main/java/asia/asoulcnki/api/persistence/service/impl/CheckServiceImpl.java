@@ -5,7 +5,7 @@ import asia.asoulcnki.api.common.duplicationcheck.SummaryHash;
 import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.service.ICheckService;
 import asia.asoulcnki.api.persistence.vo.CheckResultVo;
-import com.google.common.collect.Lists;
+import asia.asoulcnki.api.persistence.vo.CheckResultVo.RelatedReplyVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class CheckServiceImpl implements ICheckService {
 		}
 
 		// TODO refactor related item to a pojo
-		List<List<Object>> related = new ArrayList<>(textHashList.size() / 2);
+		List<RelatedReplyVo> related = new ArrayList<>(textHashList.size() / 2);
 
 		float threshHold = (float) ((float) textHashList.size() * 0.2);
 		Comparator<Map.Entry<Long, Integer>> cmp = Map.Entry.comparingByValue();
@@ -85,17 +85,17 @@ public class CheckServiceImpl implements ICheckService {
 			}
 			String replyUrl = getReplyUrl(reply);
 			allContentBuilder.append(content);
-			related.add(Lists.newArrayList(similarity, reply, replyUrl));
+			related.add(new RelatedReplyVo(similarity, reply, replyUrl));
 		}
 
 		int textLength = text.codePointCount(0, text.length());
 		// param -> left hand side and right hand side
 		related.sort((lhs, rhs) -> {
-			float lhsSimilarity = (float) lhs.get(0);
-			int lhsCTime = ((Reply) lhs.get(1)).getCtime();
+			float lhsSimilarity = lhs.getRate();
+			int lhsCTime = lhs.getReply().getCtime();
 
-			float rhsSimilarity = (float) rhs.get(0);
-			int rhsCTime = ((Reply) rhs.get(1)).getCtime();
+			float rhsSimilarity = rhs.getRate();
+			int rhsCTime = rhs.getReply().getCtime();
 
 			if (isHighSimilarity(textLength, lhsSimilarity) && isHighSimilarity(textLength, rhsSimilarity)) {
 				return Integer.compare(lhsCTime, rhsCTime);

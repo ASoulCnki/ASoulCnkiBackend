@@ -1,5 +1,6 @@
 package asia.asoulcnki.api.persistence.vo;
 
+import asia.asoulcnki.api.persistence.entity.Reply;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +19,18 @@ public class CheckResultVo {
 	@JsonProperty("end_time")
 	private int endTime;
 	@JsonProperty("related")
-	private List<List<Object>> related;
+	private List<RelatedReplyVo> related;
+
+	@Data
+	@AllArgsConstructor
+	public static class RelatedReplyVo {
+		private Float rate;
+
+		private Reply reply;
+
+		@JsonProperty("reply_url")
+		private String replyUrl;
+
+	}
 
 }

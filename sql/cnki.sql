@@ -1,3 +1,8 @@
+create
+database if not exists bilibili_cnki;
+
+use bilibili_cnki;
+
 drop table if exists user_dynamic;
 create table user_dynamic
 (
