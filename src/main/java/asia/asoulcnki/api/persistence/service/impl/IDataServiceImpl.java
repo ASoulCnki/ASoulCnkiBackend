@@ -88,8 +88,6 @@ public class IDataServiceImpl implements IDataService {
 			db.writeLock();
 			try {
 				replies.forEach(db::addReplyData);
-			} catch (Exception e) {
-				break;
 			} finally {
 				db.writeUnLock();
 			}
@@ -109,10 +107,13 @@ public class IDataServiceImpl implements IDataService {
 	public ControlResultVo checkpoint() {
 		long start = System.currentTimeMillis();
 		ComparisonDatabase db = ComparisonDatabase.getInstance();
+		db.readLock();
 		try {
 			db.dumpToImage(ComparisonDatabase.DEFAULT_IMAGE_PATH);
 		} catch (Exception e) {
 			throw new BizException(CnkiCommonEnum.INTERNAL_SERVER_ERROR, e);
+		} finally {
+			db.readUnLock();
 		}
 		log.info("checkpoint database finished, cost {} ms", System.currentTimeMillis() - start);
 		return new ControlResultVo(db.getMinTime(), db.getMaxTime());

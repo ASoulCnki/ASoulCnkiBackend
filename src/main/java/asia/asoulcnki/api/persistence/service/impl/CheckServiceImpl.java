@@ -1,7 +1,9 @@
 package asia.asoulcnki.api.persistence.service.impl;
 
+import asia.asoulcnki.api.common.BizException;
 import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
 import asia.asoulcnki.api.common.duplicationcheck.SummaryHash;
+import asia.asoulcnki.api.common.response.CnkiCommonEnum;
 import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.service.ICheckService;
 import asia.asoulcnki.api.persistence.vo.CheckResultVo;
@@ -36,17 +38,21 @@ public class CheckServiceImpl implements ICheckService {
 	}
 
 	@Override
-	@Cacheable(key = "#text", value = "replyCache")
-	public CheckResultVo check(final String text) {
-		//		int codePointCount = text.codePointCount(0, text.length());
-		//		if (codePointCount > 1000) {
-		//			log.error("the text to check is too long, codepoint number {} ", codePointCount);
-		//			throw new BizException(CnkiCommonEnum.TEXT_TO_CHECK_TOO_LONG);
-		//		}
+	public CheckResultVo check(String text) {
+		text = SummaryHash.trim(text);
+		int textLength = text.codePointCount(0, text.length());
+		if (textLength < SummaryHash.DEFAULT_K) {
+			log.error("the text to check is too short, codepoint number {} ", textLength);
+			throw new BizException(CnkiCommonEnum.TEXT_TO_CHECK_TOO_SHORT);
+		} else if (textLength > 2000) {
+			log.error("the text to check is too long, codepoint number {} ", textLength);
+			throw new BizException(CnkiCommonEnum.TEXT_TO_CHECK_TOO_LONG);
+		}
 		return getDuplicationCheckResult(text);
 	}
 
-	private CheckResultVo getDuplicationCheckResult(String text) {
+	@Cacheable(key = "#text", value = "replyCache")
+	public CheckResultVo getDuplicationCheckResult(String text) {
 		ComparisonDatabase db = ComparisonDatabase.getInstance();
 
 		ArrayList<Long> textHashList = SummaryHash.defaultHash(text);
@@ -66,7 +72,6 @@ public class CheckServiceImpl implements ICheckService {
 			}
 		}
 
-		// TODO refactor related item to a pojo
 		List<RelatedReplyVo> related = new ArrayList<>(textHashList.size() / 2);
 
 		float threshHold = (float) ((float) textHashList.size() * 0.2);
@@ -78,7 +83,7 @@ public class CheckServiceImpl implements ICheckService {
 
 		for (Map.Entry<Long, Integer> entry : sortedList) {
 			Reply reply = db.getReply(entry.getKey());
-			String content = reply.getContent();
+			String content = SummaryHash.trim(reply.getContent());
 			float similarity = SummaryHash.compareArticle(text, content);
 			if (similarity < 0.2) {
 				continue;

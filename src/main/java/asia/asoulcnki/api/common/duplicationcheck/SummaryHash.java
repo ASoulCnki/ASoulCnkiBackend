@@ -1,16 +1,20 @@
 package asia.asoulcnki.api.common.duplicationcheck;
 
+import com.google.common.collect.Lists;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class SummaryHash {
 
-	public static final int DEFAULT_K = 8;
-	public static final int DEFAULT_W = 8;
-	private static final long DEFAULT_Q = 1145141919780L;
+	public static final int DEFAULT_K = 6;
+	public static final int DEFAULT_W = 6;
+	private static final long DEFAULT_Q = 100001651L;
 	private static final int DEFAULT_B = 2;
+
 
 	private static Tuple<Long, Integer> hashValue(String s, int nextStartOffset, int k, long q, int b) {
 		BigInteger hash = BigInteger.valueOf(0);
@@ -31,7 +35,6 @@ public class SummaryHash {
 		}
 		return new Tuple<>(hash.longValue() % q, nextStartOffset);
 	}
-
 
 	/**
 	 * @param s 字符串
@@ -73,20 +76,6 @@ public class SummaryHash {
 		return hashVals;
 	}
 
-
-	public static Set<Long> getStringHashValsAsSet(String s, int k, long q, int b) {
-		int codePointNumber = s.codePointCount(0, s.length());
-		int nextOffset = 0;
-		Set<Long> hashVals = new HashSet<>(codePointNumber - k + 1);
-		for (int i = 0; i < codePointNumber - k + 1; i++) {
-			Tuple<Long, Integer> result = hashValue(s, nextOffset, k, q, b);
-			long hashVal = result.first;
-			nextOffset = result.second;
-			hashVals.add(hashVal);
-		}
-		return hashVals;
-	}
-
 	// start = index, end = index + w
 	private static long pickHash(ArrayList<Long> hashVals, int start, int end) {
 		int index = start;
@@ -101,21 +90,15 @@ public class SummaryHash {
 	}
 
 	public static float compareArticle(String article1, String article2) {
-		int k = DEFAULT_K;
-		long q = DEFAULT_Q; // 😅
-		int b = DEFAULT_B;
-
-		Set<Integer> redList = new HashSet<>();
-
-		ArrayList<Long> article1HashVal = getStringHashVals(article1, k, q, b);
-		Set<Long> article2HashValSet = getStringHashValsAsSet(article2, k, q, b);
-
 		int codePointsCount = article1.codePointCount(0, article1.length());
+		List<String> article1Segs = getStringSegs(article1);
+		Set<String> article2Segs = new HashSet<>(getStringSegs(article2));
 		float count = 0;
-		for (int i = 0; i < codePointsCount - k + 1; i++) {
-			long hashVal = article1HashVal.get(i);
-			if (article2HashValSet.contains(hashVal)) {
-				for (int j = 0; j < k; j++) {
+		Set<Integer> redList = new HashSet<>();
+		for (int i = 0; i < codePointsCount - DEFAULT_K + 1; i++) {
+			String seg = article1Segs.get(i);
+			if (article2Segs.contains(seg)) {
+				for (int j = 0; j < DEFAULT_K; j++) {
 					redList.add(i + j);
 				}
 			}
@@ -127,6 +110,32 @@ public class SummaryHash {
 		}
 
 		return count / (float) codePointsCount;
+	}
+
+	public static String trim(String s) {
+		String stopWord = "[\\pP\\p{Punct}]";
+		s = s.replaceAll("\\s*", "");
+		s = s.replaceAll(stopWord, "");
+		return s;
+	}
+
+	static List<String> getStringSegs(String s) {
+		int codePointCount = s.codePointCount(0, s.length());
+		if (codePointCount <= SummaryHash.DEFAULT_K) {
+			return Lists.newArrayList(s);
+		}
+		int startOffset = 0;
+		List<String> stringSegs = new ArrayList<>(codePointCount - SummaryHash.DEFAULT_K + 1);
+		for (int i = 0; i < codePointCount - SummaryHash.DEFAULT_K + 1; i++) {
+			String subString = unicodeSubString(s, startOffset, SummaryHash.DEFAULT_K);
+			startOffset = s.offsetByCodePoints(startOffset, 1);
+			stringSegs.add(subString);
+		}
+		return stringSegs;
+	}
+
+	static String unicodeSubString(String str, int idx, int len) {
+		return str.substring(idx, str.offsetByCodePoints(idx, len));
 	}
 
 	// TODO w 的 长度 和 k 的长度
@@ -141,6 +150,10 @@ public class SummaryHash {
 				"嘉然的脚小小的香香的，不像手经常使用来得灵活，但有一种独特的可爱的笨拙，嫩嫩的脚丫光滑细腻，凌莹剔透，看得见皮肤下面细细的血管与指甲之下粉白的月牙。再高冷的女生小脚也是敏感的害羞的，轻轻挠一挠，她就摇身一变成为娇滴滴的女孩，脚丫像是一把钥匙，轻轻掌握它就能打开女孩子的心灵。";
 		String text2 = "嘉然的脚小小的香香的,不像手经常使用来得灵活,但有一种独特的可爱的笨拙,嫩嫩的脚丫光滑细腻，凌莹剔透," +
 				"看得见皮肤下面细细的血管与指甲之下粉白的月牙再高冷的女生小脚也是敏感的害羞的，轻轻挠一挠，她就摇身一变成为娇滴滴的女孩,脚丫像是一把钥匙，轻轻掌握它就能打开女孩子的心灵。";
+		String text3 = "乃琳带我走吧！            双向奔赴～\n" + "                                         \n" + "               "
+				+ "                       \n" + "＼\uD83E\uDD24／                        ＼\uD83E\uDD8A／        　\n" + " "
+				+ "  " + "  /                                    \\  \n" + "ノ)                                     (㇏";
+		System.out.println(trim(text3));
 		ArrayList<Long> result1 = defaultHash(text1);
 		System.out.println(result1);
 		ArrayList<Long> result2 = defaultHash(text2);

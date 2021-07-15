@@ -8,6 +8,7 @@ public enum CnkiCommonEnum implements BaseErrorInfoInterface {
 	NO_TOKEN(401, "No jwt token presents"), AUTH(401, "JWT AUTH ERROR"), AUTH_USER_NOT_FOUND(401, "JWT AUTH ERROR"),
 
 	TEXT_TO_CHECK_TOO_LONG(20001, "text to check too long"),
+	TEXT_TO_CHECK_TOO_SHORT(20002, "text to check too short"),
 
 	// END
 	;

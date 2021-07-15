@@ -84,11 +84,11 @@ public class ComparisonDatabase {
 		return db;
 	}
 
-	private void readLock() {
+	public void readLock() {
 		this.rwLock.readLock().lock();
 	}
 
-	private void readUnLock() {
+	public void readUnLock() {
 		this.rwLock.readLock().unlock();
 	}
 
@@ -125,9 +125,12 @@ public class ComparisonDatabase {
 		if (reply == null || replyMap.containsKey(reply.getRpid())) {
 			return;
 		}
-		if (reply.getContent().codePointCount(0, reply.getContent().length()) < SummaryHash.DEFAULT_K) {
+
+		String content = SummaryHash.trim(reply.getContent());
+		if (content.codePointCount(0, content.length()) < SummaryHash.DEFAULT_K) {
 			return;
 		}
+
 		this.replyMap.put(reply.getRpid(), reply);
 
 		if (reply.getCtime() > this.maxTime) {
