@@ -42,4 +42,6 @@ public class Reply implements Serializable {
 	@JsonProperty("like_num")
 	private int likeNum;
 
+	private boolean copy = false;
+	private Long origin_rpid = 0L;
 }
