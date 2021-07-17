@@ -24,7 +24,8 @@
         <mysql-connector-java.version>8.0.21</mysql-connector-java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j-api.version>1.7.25</slf4j-api.version>
-        <springfox-swagger2.version>3.0.0</springfox-swagger2.version>
+	<springfox-swagger2.version>3.0.0</springfox-swagger2.version>
+	<docker.registry>registry.cn-hangzhou.aliyuncs.com</docker.registry>
         <docker.image.prefix>asoulcnki</docker.image.prefix>
         <dockerfile-maven-plugin.version>1.4.7</dockerfile-maven-plugin.version>
     </properties>
@@ -154,7 +155,7 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.4.13</version>
                 <configuration>
-                    <imageName>${project.name}:${project.version}</imageName>
+			<imageName>${docker.registry}/${docker.image.prefix}/${project.name}:${project.version}</imageName>
                     <dockerDirectory>src/main/docker</dockerDirectory>
                     <resources>
                         <resource>
