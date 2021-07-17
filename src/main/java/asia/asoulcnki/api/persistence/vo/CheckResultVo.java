@@ -19,11 +19,12 @@ public class CheckResultVo {
 	@JsonProperty("end_time")
 	private int endTime;
 	@JsonProperty("related")
-	private List<RelatedReplyVo> related;
+	private List<RelatedReply> related;
 
 	@Data
 	@AllArgsConstructor
-	public static class RelatedReplyVo {
+	@NoArgsConstructor
+	public static class RelatedReply {
 		private Float rate;
 
 		private Reply reply;

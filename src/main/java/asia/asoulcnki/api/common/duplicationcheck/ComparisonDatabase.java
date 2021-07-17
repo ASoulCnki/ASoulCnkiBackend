@@ -12,14 +12,18 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 public class ComparisonDatabase {
 	public static final String DEFAULT_IMAGE_PATH = "data/database.dat";
 	private final static Logger log = LoggerFactory.getLogger(ComparisonDatabase.class);
+	private final static int initialCapacity = 100 * 10000;
 	private static ComparisonDatabase instance;
 	private transient ReadWriteLock rwLock;
 
@@ -36,8 +40,8 @@ public class ComparisonDatabase {
 		this.minTime = Integer.MAX_VALUE;
 		this.maxTime = 0;
 		this.rwLock = new ReentrantReadWriteLock();
-		this.replyMap = new HashMap<>(70 * 10000);
-		this.textHashMap = new HashMap<>(70 * 10000);
+		this.replyMap = new HashMap<>(initialCapacity);
+		this.textHashMap = new HashMap<>(initialCapacity);
 	}
 
 	public static synchronized ComparisonDatabase getInstance() {
@@ -84,6 +88,34 @@ public class ComparisonDatabase {
 		return db;
 	}
 
+	// return: key-> rpid, value -> hit count
+	public static List<Map.Entry<Long, Integer>> searchRelatedReplies(ArrayList<Long> textHashList, int minHit) {
+		float threshold = (float) (textHashList.size() * 0.2);
+		if (threshold <= minHit) {
+			threshold = minHit;
+		}
+		return searchRelatedReplies(textHashList, threshold);
+	}
+
+	public static List<Map.Entry<Long, Integer>> searchRelatedReplies(ArrayList<Long> textHashList, float threshold) {
+		Map<Long, Integer> replyHitMap = new HashMap<>();
+		for (Long textHash : textHashList) {
+			ArrayList<Long> hitReplyIds = ComparisonDatabase.getInstance().searchHash(textHash);
+			if (hitReplyIds != null) {
+				for (long id : hitReplyIds) {
+					if (replyHitMap.containsKey(id)) {
+						int count = replyHitMap.get(id);
+						replyHitMap.put(id, count + 1);
+					} else {
+						replyHitMap.put(id, 1);
+					}
+				}
+			}
+		}
+		Comparator<Map.Entry<Long, Integer>> cmp = Map.Entry.comparingByValue();
+		return replyHitMap.entrySet().stream().filter(entry -> entry.getValue() > threshold).sorted(cmp.reversed()).collect(Collectors.toList());
+	}
+
 	public void readLock() {
 		this.rwLock.readLock().lock();
 	}
@@ -114,8 +146,8 @@ public class ComparisonDatabase {
 			this.maxRpid = 0;
 			this.minTime = Integer.MAX_VALUE;
 			this.maxTime = 0;
-			this.replyMap = new HashMap<>(70 * 10000);
-			this.textHashMap = new HashMap<>(70 * 10000);
+			this.replyMap = new HashMap<>(initialCapacity);
+			this.textHashMap = new HashMap<>(initialCapacity);
 		} finally {
 			this.writeUnLock();
 		}
@@ -126,8 +158,10 @@ public class ComparisonDatabase {
 			return;
 		}
 
-		String content = SummaryHash.trim(reply.getContent());
-		if (content.codePointCount(0, content.length()) < SummaryHash.DEFAULT_K) {
+		String content = ArticleCompareUtil.trim(reply.getContent());
+		int codePointCount = content.codePointCount(0, content.length());
+
+		if (codePointCount < SummaryHash.DEFAULT_K) {
 			return;
 		}
 
@@ -143,13 +177,40 @@ public class ComparisonDatabase {
 			this.maxRpid = reply.getRpid();
 		}
 
-		ArrayList<Long> textHashList = SummaryHash.defaultHash(reply.getContent());
+		ArrayList<Long> textHashList = SummaryHash.defaultHash(content);
 
+		// calculate IF
+		if (codePointCount > 40) {
+			// key-> rpid, value -> hit count
+			List<Map.Entry<Long, Integer>> sortedRelatedReplies = searchRelatedReplies(textHashList, 2);
+
+			for (Map.Entry<Long, Integer> entry : sortedRelatedReplies) {
+				Reply relatedReply = this.getReply(entry.getKey());
+				// we only process original reply
+				if (relatedReply.getOriginRpid() >= 0) {
+					continue;
+				}
+				String relatedContent = ArticleCompareUtil.trim(relatedReply.getContent());
+				int relatedContentLength = ArticleCompareUtil.textLength(relatedContent);
+				float similarity = ArticleCompareUtil.compareArticle(content, relatedContent);
+				if (ArticleCompareUtil.isHighSimilarity(relatedContentLength, similarity)) {
+					reply.setOriginRpid(relatedReply.getRpid());
+					relatedReply.setSimilarCount(relatedReply.getSimilarCount() + 1);
+					break;
+				}
+			}
+		}
+
+		// add text hash to search database
 		for (final Long textHash : textHashList) {
 			if (!textHashMap.containsKey(textHash)) {
 				textHashMap.put(textHash, new ArrayList<>());
 			}
 			textHashMap.get(textHash).add(reply.getRpid());
+		}
+
+		if (replyMap.size() % 20000 == 0) {
+			log.info("reply size: {}", replyMap.size());
 		}
 	}
 
@@ -171,21 +232,12 @@ public class ComparisonDatabase {
 		}
 	}
 
-
-	public ReadWriteLock getRwLock() {
-		return rwLock;
-	}
-
 	public int getMinTime() {
 		return minTime;
 	}
 
 	public int getMaxTime() {
 		return maxTime;
-	}
-
-	public long getMaxRpid() {
-		return maxRpid;
 	}
 
 }
