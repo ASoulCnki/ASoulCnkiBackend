@@ -1,5 +1,6 @@
 package asia.asoulcnki.api.persistence.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -42,4 +43,11 @@ public class Reply implements Serializable {
 	@JsonProperty("like_num")
 	private int likeNum;
 
+	@JsonProperty("origin_rpid")
+	@TableField(exist = false)
+	private Long originRpid = -1L;
+
+	@TableField(exist = false)
+	@JsonProperty("similar_count")
+	private Integer similarCount = 0;
 }

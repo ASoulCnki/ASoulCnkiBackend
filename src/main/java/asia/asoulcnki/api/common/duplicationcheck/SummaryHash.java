@@ -1,17 +1,12 @@
 package asia.asoulcnki.api.common.duplicationcheck;
 
-import com.google.common.collect.Lists;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class SummaryHash {
 
-	public static final int DEFAULT_K = 6;
-	public static final int DEFAULT_W = 6;
+	public static final int DEFAULT_K = 8;
+	public static final int DEFAULT_W = 8;
 	private static final long DEFAULT_Q = 100001651L;
 	private static final int DEFAULT_B = 2;
 
@@ -89,55 +84,6 @@ public class SummaryHash {
 		return minHash;
 	}
 
-	public static float compareArticle(String article1, String article2) {
-		int codePointsCount = article1.codePointCount(0, article1.length());
-		List<String> article1Segs = getStringSegs(article1);
-		Set<String> article2Segs = new HashSet<>(getStringSegs(article2));
-		float count = 0;
-		Set<Integer> redList = new HashSet<>();
-		for (int i = 0; i < codePointsCount - DEFAULT_K + 1; i++) {
-			String seg = article1Segs.get(i);
-			if (article2Segs.contains(seg)) {
-				for (int j = 0; j < DEFAULT_K; j++) {
-					redList.add(i + j);
-				}
-			}
-		}
-		for (int i = 0; i < codePointsCount; i++) {
-			if (redList.contains(i)) {
-				count += 1;
-			}
-		}
-
-		return count / (float) codePointsCount;
-	}
-
-	public static String trim(String s) {
-		String stopWord = "[\\pP\\p{Punct}]";
-		s = s.replaceAll("\\s*", "");
-		s = s.replaceAll(stopWord, "");
-		return s;
-	}
-
-	static List<String> getStringSegs(String s) {
-		int codePointCount = s.codePointCount(0, s.length());
-		if (codePointCount <= SummaryHash.DEFAULT_K) {
-			return Lists.newArrayList(s);
-		}
-		int startOffset = 0;
-		List<String> stringSegs = new ArrayList<>(codePointCount - SummaryHash.DEFAULT_K + 1);
-		for (int i = 0; i < codePointCount - SummaryHash.DEFAULT_K + 1; i++) {
-			String subString = unicodeSubString(s, startOffset, SummaryHash.DEFAULT_K);
-			startOffset = s.offsetByCodePoints(startOffset, 1);
-			stringSegs.add(subString);
-		}
-		return stringSegs;
-	}
-
-	static String unicodeSubString(String str, int idx, int len) {
-		return str.substring(idx, str.offsetByCodePoints(idx, len));
-	}
-
 	// TODO w 的 长度 和 k 的长度
 	// 找评论区里表现不太好的查重结果
 	// 去掉空格和回车，标点符号之后再计算hash值
@@ -153,13 +99,13 @@ public class SummaryHash {
 		String text3 = "乃琳带我走吧！            双向奔赴～\n" + "                                         \n" + "               "
 				+ "                       \n" + "＼\uD83E\uDD24／                        ＼\uD83E\uDD8A／        　\n" + " "
 				+ "  " + "  /                                    \\  \n" + "ノ)                                     (㇏";
-		System.out.println(trim(text3));
+		System.out.println(ArticleCompareUtil.trim(text3));
 		ArrayList<Long> result1 = defaultHash(text1);
 		System.out.println(result1);
 		ArrayList<Long> result2 = defaultHash(text2);
 		System.out.println(result2);
-		System.out.println(compareArticle(text1, text2));
-		System.out.println(compareArticle(text2, text2));
+		System.out.println(ArticleCompareUtil.compareArticle(text1, text2));
+		System.out.println(ArticleCompareUtil.compareArticle(text2, text2));
 	}
 
 	public static class Tuple<A, B> {
