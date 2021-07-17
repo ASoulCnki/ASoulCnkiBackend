@@ -6,7 +6,7 @@
     <description>Backend project of asoulcnki.asia</description>
     <groupId>asia.asoucnki</groupId>
     <artifactId>api</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>latest</version>
 
     <parent>
         <artifactId>spring-boot-starter-parent</artifactId>
