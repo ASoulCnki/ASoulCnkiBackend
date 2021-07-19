@@ -1,12 +1,12 @@
-package asia.asoulcnki.api.persistence.service.impl;
+package asia.asoulcnki.api.service.impl;
 
 import asia.asoulcnki.api.common.BizException;
 import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
 import asia.asoulcnki.api.common.response.CnkiCommonEnum;
 import asia.asoulcnki.api.persistence.entity.Reply;
-import asia.asoulcnki.api.persistence.service.IDataService;
-import asia.asoulcnki.api.persistence.service.IReplyService;
 import asia.asoulcnki.api.persistence.vo.ControlResultVo;
+import asia.asoulcnki.api.service.IDataService;
+import asia.asoulcnki.api.service.IReplyService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
@@ -66,7 +66,7 @@ public class IDataServiceImpl implements IDataService {
 		ComparisonDatabase db = ComparisonDatabase.getInstance();
 
 		int pageIndex = 1;
-		int pageSize = 20000;
+		int pageSize = 50000;
 
 
 		int count = 0;

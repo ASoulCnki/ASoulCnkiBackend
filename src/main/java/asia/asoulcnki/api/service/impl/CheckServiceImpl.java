@@ -1,4 +1,4 @@
-package asia.asoulcnki.api.persistence.service.impl;
+package asia.asoulcnki.api.service.impl;
 
 import asia.asoulcnki.api.common.BizException;
 import asia.asoulcnki.api.common.duplicationcheck.ArticleCompareUtil;
@@ -7,7 +7,7 @@ import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
 import asia.asoulcnki.api.common.duplicationcheck.SummaryHash;
 import asia.asoulcnki.api.common.response.CnkiCommonEnum;
 import asia.asoulcnki.api.persistence.entity.Reply;
-import asia.asoulcnki.api.persistence.service.ICheckService;
+import asia.asoulcnki.api.service.ICheckService;
 import asia.asoulcnki.api.persistence.vo.CheckResultVo;
 import asia.asoulcnki.api.persistence.vo.CheckResultVo.RelatedReply;
 import org.apache.commons.lang3.StringUtils;

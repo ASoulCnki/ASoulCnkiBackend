@@ -1,4 +1,4 @@
-package asia.asoulcnki.api.persistence.service;
+package asia.asoulcnki.api.service;
 
 import asia.asoulcnki.api.persistence.vo.ControlResultVo;
 

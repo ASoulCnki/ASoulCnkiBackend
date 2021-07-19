@@ -50,4 +50,8 @@ public class Reply implements Serializable {
 	@TableField(exist = false)
 	@JsonProperty("similar_count")
 	private Integer similarCount = 0;
+
+	@TableField(exist = false)
+	@JsonProperty("similar_like_sum")
+	private Integer similarLikeSum = 0;
 }

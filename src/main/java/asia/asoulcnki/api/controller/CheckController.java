@@ -2,7 +2,7 @@ package asia.asoulcnki.api.controller;
 
 import asia.asoulcnki.api.common.response.ApiResult;
 import asia.asoulcnki.api.persistence.param.CheckReplyParam;
-import asia.asoulcnki.api.persistence.service.ICheckService;
+import asia.asoulcnki.api.service.ICheckService;
 import asia.asoulcnki.api.persistence.vo.CheckResultVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

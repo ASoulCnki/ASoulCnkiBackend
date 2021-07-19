@@ -4,7 +4,7 @@ import asia.asoulcnki.api.common.BizException;
 import asia.asoulcnki.api.common.response.ApiResult;
 import asia.asoulcnki.api.common.response.CnkiCommonEnum;
 import asia.asoulcnki.api.persistence.param.ControlParam;
-import asia.asoulcnki.api.persistence.service.IDataService;
+import asia.asoulcnki.api.service.IDataService;
 import asia.asoulcnki.api.persistence.vo.ControlResultVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

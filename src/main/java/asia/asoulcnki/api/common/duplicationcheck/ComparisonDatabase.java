@@ -116,6 +116,10 @@ public class ComparisonDatabase {
 		return replyHitMap.entrySet().stream().filter(entry -> entry.getValue() > threshold).sorted(cmp.reversed()).collect(Collectors.toList());
 	}
 
+	public Map<Long, Reply> getReplyMap() {
+		return replyMap;
+	}
+
 	public void readLock() {
 		this.rwLock.readLock().lock();
 	}
@@ -154,14 +158,32 @@ public class ComparisonDatabase {
 	}
 
 	public void addReplyData(Reply reply) {
-		if (reply == null || replyMap.containsKey(reply.getRpid())) {
+		if (reply == null) {
 			return;
+		}
+
+		Reply oldReply = replyMap.get(reply.getRpid());
+
+		if (oldReply != null && oldReply.getLikeNum() != reply.getLikeNum()) {
+			// update related like sum
+			if (oldReply.getOriginRpid() >= 0) {
+				Reply relatedReply = replyMap.get(oldReply.getOriginRpid());
+				int likeSum = relatedReply.getSimilarLikeSum();
+				likeSum = likeSum - oldReply.getLikeNum() + reply.getLikeNum();
+				relatedReply.setSimilarLikeSum(likeSum);
+			}
+			oldReply.setLikeNum(reply.getLikeNum());
 		}
 
 		String content = ArticleCompareUtil.trim(reply.getContent());
 		int codePointCount = content.codePointCount(0, content.length());
 
 		if (codePointCount < SummaryHash.DEFAULT_K) {
+			return;
+		}
+
+		// we don't process chess 😈
+		if (content.contains("┼┼┼┼┼┼┼┼") || content.contains("┏┯┯┯┯┯┯┯┯┯┓") || content.contains("┏┯┯┯┯┯┯┯┯┯┯┯┯┯┯┯┯┓")) {
 			return;
 		}
 
@@ -180,7 +202,7 @@ public class ComparisonDatabase {
 		ArrayList<Long> textHashList = SummaryHash.defaultHash(content);
 
 		// calculate IF
-		if (codePointCount > 40) {
+		if (codePointCount > 30) {
 			// key-> rpid, value -> hit count
 			List<Map.Entry<Long, Integer>> sortedRelatedReplies = searchRelatedReplies(textHashList, 2);
 
@@ -196,9 +218,14 @@ public class ComparisonDatabase {
 				if (ArticleCompareUtil.isHighSimilarity(relatedContentLength, similarity)) {
 					reply.setOriginRpid(relatedReply.getRpid());
 					relatedReply.setSimilarCount(relatedReply.getSimilarCount() + 1);
+					relatedReply.setSimilarLikeSum(reply.getLikeNum() + relatedReply.getSimilarLikeSum());
 					break;
 				}
 			}
+		}
+
+		if (reply.getOriginRpid() < 0) {
+			reply.setSimilarLikeSum(reply.getLikeNum());
 		}
 
 		// add text hash to search database
