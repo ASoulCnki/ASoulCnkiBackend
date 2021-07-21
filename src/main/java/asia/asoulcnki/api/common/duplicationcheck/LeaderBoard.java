@@ -1,7 +1,7 @@
 package asia.asoulcnki.api.common.duplicationcheck;
 
 import asia.asoulcnki.api.persistence.entity.Reply;
-import com.google.common.collect.Lists;
+import asia.asoulcnki.api.persistence.vo.RankingResultVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,19 +132,19 @@ public class LeaderBoard {
 			}
 		}
 
-		public List<Reply> query(Predicate<Reply> predicate, int pageSize, int pageNum) {
+		public RankingResultVo query(Predicate<Reply> predicate, int pageSize, int pageNum) {
 			rwLock.readLock().lock();
 			try {
 				if (pageSize != 10 || pageNum < 1) {
-					return Lists.newArrayList();
+					return new RankingResultVo();
 				}
 				List<Reply> result = sortedReplies.stream().filter(predicate).collect(Collectors.toList());
-				return page(result, pageSize, pageNum);
+				int minTime = ComparisonDatabase.getInstance().getMinTime();
+				int maxTime = ComparisonDatabase.getInstance().getMaxTime();
+				return new RankingResultVo(page(result, pageSize, pageNum), result.size(), minTime, maxTime);
 			} finally {
 				rwLock.readLock().unlock();
 			}
 		}
 	}
-
-
 }

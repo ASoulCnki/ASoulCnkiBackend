@@ -13,18 +13,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.function.Predicate;
 
 @Service
 @CacheConfig(cacheNames = "caffeineCacheManager")
 public class IRankingServiceImpl implements IRankingService {
-
-
-	public List<Reply> queryLeaderBoard(LeaderBoardEntry leaderBoard, Predicate<Reply> predicate, int pageSize,
-			int pageNum) {
-		return leaderBoard.query(predicate, pageSize, pageNum);
-	}
 
 	@Override
 	@Cacheable(value = "leaderboard")
@@ -59,9 +52,7 @@ public class IRankingServiceImpl implements IRankingService {
 			break;
 		}
 
-		List<Reply> result = queryLeaderBoard(leaderBoard, predicate, pageSize, pageNum);
-
-		return new RankingResultVo(result);
+		return leaderBoard.query(predicate, pageSize, pageNum);
 	}
 
 	@Override
