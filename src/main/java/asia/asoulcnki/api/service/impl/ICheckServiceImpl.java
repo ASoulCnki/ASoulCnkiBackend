@@ -23,8 +23,8 @@ import java.util.Map;
 
 @Service
 @CacheConfig(cacheNames = "caffeineCacheManager")
-public class CheckServiceImpl implements ICheckService {
-	private final static Logger log = LoggerFactory.getLogger(CheckServiceImpl.class);
+public class ICheckServiceImpl implements ICheckService {
+	private final static Logger log = LoggerFactory.getLogger(ICheckServiceImpl.class);
 
 
 	@Override

@@ -7,5 +7,5 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ReplyService extends ServiceImpl<ReplyMapper, Reply> implements IReplyService {
+public class IReplyServiceImpl extends ServiceImpl<ReplyMapper, Reply> implements IReplyService {
 }
