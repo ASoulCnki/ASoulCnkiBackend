@@ -2,10 +2,12 @@ package asia.asoulcnki.api.service.impl;
 
 import asia.asoulcnki.api.common.BizException;
 import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
+import asia.asoulcnki.api.common.duplicationcheck.LeaderBoard;
 import asia.asoulcnki.api.common.response.CnkiCommonEnum;
 import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.vo.ControlResultVo;
 import asia.asoulcnki.api.service.IDataService;
+import asia.asoulcnki.api.service.IRankingService;
 import asia.asoulcnki.api.service.IReplyService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -28,7 +30,10 @@ import java.util.List;
 public class IDataServiceImpl implements IDataService {
 	private final static Logger log = LoggerFactory.getLogger(IDataServiceImpl.class);
 	@Autowired
-	IReplyService IReplyService;
+	IReplyService replyService;
+
+	@Autowired
+	IRankingService rankingService;
 
 	public static List<Reply> getJsonFile(String path) {
 		ObjectMapper objMapper = new ObjectMapper();
@@ -46,7 +51,7 @@ public class IDataServiceImpl implements IDataService {
 	public long getStartRpid(int startTime) {
 		QueryWrapper<Reply> queryWrapper = new QueryWrapper<>();
 		queryWrapper.gt("ctime", startTime).select("min(rpid) as min_rpid");
-		List<Object> r = IReplyService.getBaseMapper().selectObjs(queryWrapper);
+		List<Object> r = replyService.getBaseMapper().selectObjs(queryWrapper);
 		if (r == null) {
 			return 0;
 		} else {
@@ -79,7 +84,7 @@ public class IDataServiceImpl implements IDataService {
 
 			long start = System.currentTimeMillis();
 			// query database
-			List<Reply> replies = IReplyService.list(queryWrapper);
+			List<Reply> replies = replyService.list(queryWrapper);
 			if (replies == null || replies.isEmpty()) {
 				break;
 			}
@@ -110,6 +115,7 @@ public class IDataServiceImpl implements IDataService {
 		db.readLock();
 		try {
 			db.dumpToImage(ComparisonDatabase.DEFAULT_IMAGE_PATH);
+			rankingService.refresh();
 		} catch (Exception e) {
 			throw new BizException(CnkiCommonEnum.INTERNAL_SERVER_ERROR, e);
 		} finally {

@@ -25,8 +25,15 @@ public class HighIfJSONGenerator {
 	static void highLikeCount() {
 		ComparisonDatabase db = ComparisonDatabase.getInstance();
 		long start = System.currentTimeMillis();
+		long allCount = db.getReplyMap().values().stream().filter(r -> r.getLikeNum() > 50).count();
+		System.out.println(allCount);
 		List<Reply> replies =
 				db.getReplyMap().values().stream().filter(e -> e.getSimilarCount() >= 1).sorted(Comparator.comparing(Reply::getSimilarLikeSum).reversed()).collect(Collectors.toList());
+		System.out.println(replies.size());
+		long count = replies.stream().filter(r -> r.getSimilarLikeSum() > 10).count();
+		long count2 = replies.stream().filter(r -> r.getSimilarCount() > 1).count();
+		System.out.println(count);
+		System.out.println(count2);
 		long end = System.currentTimeMillis();
 		System.out.printf("cost %d ms ", end - start);
 		String jsonString = JSONArray.toJSONString(replies, true);
