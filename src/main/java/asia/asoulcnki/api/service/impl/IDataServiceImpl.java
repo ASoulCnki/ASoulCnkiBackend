@@ -2,7 +2,6 @@ package asia.asoulcnki.api.service.impl;
 
 import asia.asoulcnki.api.common.BizException;
 import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
-import asia.asoulcnki.api.common.duplicationcheck.LeaderBoard;
 import asia.asoulcnki.api.common.response.CnkiCommonEnum;
 import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.vo.ControlResultVo;
@@ -114,7 +113,7 @@ public class IDataServiceImpl implements IDataService {
 		ComparisonDatabase db = ComparisonDatabase.getInstance();
 		db.readLock();
 		try {
-			db.dumpToImage(ComparisonDatabase.DEFAULT_IMAGE_PATH);
+			db.dumpToImage(ComparisonDatabase.DEFAULT_DATA_DIR, ComparisonDatabase.DEFAULT_IMAGE_FILE_NAME);
 			rankingService.refresh();
 		} catch (Exception e) {
 			throw new BizException(CnkiCommonEnum.INTERNAL_SERVER_ERROR, e);

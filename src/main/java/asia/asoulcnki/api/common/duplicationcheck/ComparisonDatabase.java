@@ -21,7 +21,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 public class ComparisonDatabase {
-	public static final String DEFAULT_IMAGE_PATH = "data/database.dat";
+	public static final String DEFAULT_DATA_DIR = "data";
+	public static final String DEFAULT_IMAGE_FILE_NAME = "database.dat";
 	private final static Logger log = LoggerFactory.getLogger(ComparisonDatabase.class);
 	private final static int initialCapacity = 100 * 10000;
 	private static ComparisonDatabase instance;
@@ -51,7 +52,7 @@ public class ComparisonDatabase {
 					try {
 						long start = System.currentTimeMillis();
 						log.info("start to load comparison database...");
-						instance = loadFromImage(DEFAULT_IMAGE_PATH);
+						instance = loadFromImage(DEFAULT_DATA_DIR + "/" + DEFAULT_IMAGE_FILE_NAME);
 						log.info("load database cost {} ms", System.currentTimeMillis() - start);
 					} catch (Exception e) {
 						instance = new ComparisonDatabase();
@@ -136,9 +137,13 @@ public class ComparisonDatabase {
 		this.rwLock.writeLock().unlock();
 	}
 
-	public void dumpToImage(String path) throws IOException {
+	public void dumpToImage(String dataDir, String imageName) throws IOException {
+		File folder = new File(dataDir);
+		if (!folder.exists() && !folder.isDirectory()) {
+			folder.mkdirs();
+		}
 		Kryo kryo = new Kryo();
-		File file = new File(path);
+		File file = new File(dataDir + "/" + imageName);
 		Output output = new Output(new FileOutputStream(file));
 		kryo.writeObject(output, this);
 		output.close();
