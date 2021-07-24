@@ -127,6 +127,7 @@ public class LeaderBoard {
 		}
 
 		public RankingResultVo query(Predicate<Reply> predicate, int pageSize, int pageNum) {
+			ComparisonDatabase.getInstance().readLock();
 			rwLock.readLock().lock();
 			try {
 				if (pageSize != 10 || pageNum < 1) {
@@ -137,6 +138,7 @@ public class LeaderBoard {
 				int maxTime = ComparisonDatabase.getInstance().getMaxTime();
 				return new RankingResultVo(page(result, pageSize, pageNum), result.size(), minTime, maxTime);
 			} finally {
+				ComparisonDatabase.getInstance().readUnLock();
 				rwLock.readLock().unlock();
 			}
 		}
