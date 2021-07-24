@@ -1,8 +1,0 @@
-language: java
-jdk: openjdk8
-services: docker
-before_install:
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" "$DOCKER_REGISTRY" --password-stdin
-script:
-        - mvn clean package docker:build -Dmaven.test.skip=true
-        - docker push ${DOCKER_REPO}:latest
