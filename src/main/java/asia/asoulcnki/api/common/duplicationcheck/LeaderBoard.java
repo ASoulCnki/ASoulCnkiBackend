@@ -2,11 +2,13 @@ package asia.asoulcnki.api.common.duplicationcheck;
 
 import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.vo.RankingResultVo;
+import asia.asoulcnki.api.service.IRankingService.TimeRangeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -19,21 +21,28 @@ public class LeaderBoard {
 	private final static Logger log = LoggerFactory.getLogger(LeaderBoard.class);
 	private static LeaderBoard instance;
 	// 累积赞数排序，至少为50，且引用次数至少为1
-	private final LeaderBoardEntry likeSummaryLeaderBoard;
+	private final LeaderBoardEntry similarLikeSumLeaderboard;
 	// 单评论赞数排序，至少为50
 	private final LeaderBoardEntry likeLeaderBoard;
 	// 引用次数排序，至少为5
 	private final LeaderBoardEntry similarCountLeaderBoard;
 
 	private LeaderBoard() {
-		likeSummaryLeaderBoard = new LeaderBoardEntry(r -> r.getSimilarLikeSum() > 50 && r.getSimilarCount() > 0,
-				Comparator.comparing(Reply::getSimilarLikeSum).reversed());
 
-		likeLeaderBoard = new LeaderBoardEntry(r -> r.getLikeNum() > 50,
-				Comparator.comparing(Reply::getLikeNum).reversed());
+		similarLikeSumLeaderboard = new LeaderBoardEntry(Comparator.comparing(Reply::getSimilarLikeSum).reversed());
+		similarLikeSumLeaderboard.setAllRepliesFilter(FilterRules.similarLikeSumGreaterThan(100).and(FilterRules.similarLikeCountGreaterThan(1)));
+		similarLikeSumLeaderboard.setRepliesInOneWeekFilter(FilterRules.similarLikeSumGreaterThan(80).and(FilterRules.similarLikeCountGreaterThan(0)));
+		similarLikeSumLeaderboard.setRepliesInThreeDaysFilter(FilterRules.similarLikeSumGreaterThan(50).and(FilterRules.similarLikeCountGreaterThan(0)));
 
-		similarCountLeaderBoard = new LeaderBoardEntry(r -> r.getSimilarCount() > 5,
-				Comparator.comparing(Reply::getSimilarCount).reversed());
+		likeLeaderBoard = new LeaderBoardEntry(Comparator.comparing(Reply::getLikeNum).reversed());
+		likeLeaderBoard.setAllRepliesFilter(FilterRules.likeNumGreaterThan(300));
+		likeLeaderBoard.setRepliesInOneWeekFilter(FilterRules.likeNumGreaterThan(150));
+		likeLeaderBoard.setRepliesInThreeDaysFilter(FilterRules.likeNumGreaterThan(100));
+
+		similarCountLeaderBoard = new LeaderBoardEntry(Comparator.comparing(Reply::getSimilarCount).reversed());
+		similarCountLeaderBoard.setAllRepliesFilter(FilterRules.similarLikeCountGreaterThan(5));
+		similarCountLeaderBoard.setRepliesInOneWeekFilter(FilterRules.similarLikeCountGreaterThan(1));
+		similarCountLeaderBoard.setRepliesInThreeDaysFilter(FilterRules.similarLikeCountGreaterThan(0));
 
 		refresh();
 	}
@@ -56,9 +65,35 @@ public class LeaderBoard {
 		System.out.println(result / 1000);
 	}
 
+	public static <T> List<T> page(List<T> list, Integer pageSize, Integer pageNum) {
+		// now we only support page size as 10
+		if (list == null || list.isEmpty() || pageSize != 10) {
+			return null;
+		}
 
-	public LeaderBoardEntry getLikeSummaryLeaderBoard() {
-		return likeSummaryLeaderBoard;
+		int recordCount = list.size();
+		int pageCount = recordCount % pageSize == 0 ? recordCount / pageSize : recordCount / pageSize + 1;
+
+		int fromIndex; //开始索引
+		int toIndex; //结束索引
+
+		if (pageNum > pageCount) {
+			pageNum = pageCount;
+		}
+
+		if (!pageNum.equals(pageCount)) {
+			fromIndex = (pageNum - 1) * pageSize;
+			toIndex = fromIndex + pageSize;
+		} else {
+			fromIndex = (pageNum - 1) * pageSize;
+			toIndex = recordCount;
+		}
+
+		return list.subList(fromIndex, toIndex);
+	}
+
+	public LeaderBoardEntry getSimilarLikeSumLeaderboard() {
+		return similarLikeSumLeaderboard;
 	}
 
 	public LeaderBoardEntry getLikeLeaderBoard() {
@@ -72,71 +107,87 @@ public class LeaderBoard {
 	public void refresh() {
 		similarCountLeaderBoard.refresh();
 		likeLeaderBoard.refresh();
-		likeSummaryLeaderBoard.refresh();
+		similarLikeSumLeaderboard.refresh();
 	}
 
 	public static class LeaderBoardEntry {
-		private final Predicate<Reply> filterPredicate;
 		private final Comparator<? super Reply> comparator;
 		private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+		List<Reply> allReplies;
+		List<Reply> repliesInOneWeek;
+		List<Reply> repliesInThreeDays;
+		private Predicate<Reply> allRepliesFilter;
+		private Predicate<Reply> repliesInOneWeekFilter;
+		private Predicate<Reply> repliesInThreeDaysFilter;
 
-		List<Reply> sortedReplies;
-
-		private LeaderBoardEntry(final Predicate<Reply> filterPredicate, final Comparator<Reply> comparator) {
-			this.filterPredicate = filterPredicate;
+		private LeaderBoardEntry(final Comparator<Reply> comparator) {
 			this.comparator = comparator;
 		}
 
-		public static <T> List<T> page(List<T> list, Integer pageSize, Integer pageNum) {
-			// now we only support page size as 10
-			if (list == null || list.isEmpty() || pageSize != 10) {
-				return null;
-			}
 
-			int recordCount = list.size();
-			int pageCount = recordCount % pageSize == 0 ? recordCount / pageSize : recordCount / pageSize + 1;
+		public void setAllRepliesFilter(final Predicate<Reply> allRepliesFilter) {
+			this.allRepliesFilter = allRepliesFilter;
+		}
 
-			int fromIndex; //开始索引
-			int toIndex; //结束索引
+		public void setRepliesInThreeDaysFilter(final Predicate<Reply> repliesInThreeDaysFilter) {
+			this.repliesInThreeDaysFilter = repliesInThreeDaysFilter;
+		}
 
-			if (pageNum > pageCount) {
-				pageNum = pageCount;
-			}
-
-			if (!pageNum.equals(pageCount)) {
-				fromIndex = (pageNum - 1) * pageSize;
-				toIndex = fromIndex + pageSize;
-			} else {
-				fromIndex = (pageNum - 1) * pageSize;
-				toIndex = recordCount;
-			}
-
-			return list.subList(fromIndex, toIndex);
+		public void setRepliesInOneWeekFilter(final Predicate<Reply> repliesInOneWeekFilter) {
+			this.repliesInOneWeekFilter = repliesInOneWeekFilter;
 		}
 
 		void refresh() {
 			ComparisonDatabase.getInstance().readLock();
 			rwLock.writeLock().lock();
 			try {
-				sortedReplies = ComparisonDatabase.getInstance().getReplyMap().values().stream(). //
-						filter(filterPredicate).sorted(comparator).collect(Collectors.toList());
+
+				allReplies = ComparisonDatabase.getInstance().getReplyMap().values().stream(). //
+						filter(allRepliesFilter).sorted(comparator).collect(Collectors.toList());
+
+				Calendar c = Calendar.getInstance();
+				Date maxTime = new Date(ComparisonDatabase.getInstance().getMaxTime() * 1000L);
+				c.setTime(maxTime);
+				c.add(Calendar.DATE, -7);
+				Predicate<Reply> timePredicate = r -> r.getCtime() * 1000L >= c.getTime().getTime();
+				repliesInOneWeek = ComparisonDatabase.getInstance().getReplyMap().values().stream(). //
+						filter(repliesInOneWeekFilter.and(timePredicate)).sorted(comparator).collect(Collectors.toList());
+
+				c.setTime(maxTime);
+				c.add(Calendar.DATE, -3);
+				timePredicate = r -> r.getCtime() * 1000L >= c.getTime().getTime();
+				repliesInThreeDays = ComparisonDatabase.getInstance().getReplyMap().values().stream(). //
+						filter(repliesInThreeDaysFilter.and(timePredicate)).sorted(comparator).collect(Collectors.toList());
+
 			} finally {
 				ComparisonDatabase.getInstance().readUnLock();
 				rwLock.writeLock().unlock();
 			}
 		}
 
-		public RankingResultVo query(Predicate<Reply> predicate, int pageSize, int pageNum) {
+		public RankingResultVo query(TimeRangeEnum timeRange, int pageSize, int pageNum) {
 			ComparisonDatabase.getInstance().readLock();
 			rwLock.readLock().lock();
 			try {
 				if (pageSize != 10 || pageNum < 1) {
 					return new RankingResultVo();
 				}
-				List<Reply> result = sortedReplies.stream().filter(predicate).collect(Collectors.toList());
+
+				// set time filter
+				List<Reply> targetReplySource = allReplies;
+				switch (timeRange) {
+				case ONE_WEEK:
+					targetReplySource = repliesInOneWeek;
+					break;
+				case THREE_DAYS:
+					targetReplySource = repliesInThreeDays;
+					break;
+				}
+
 				int minTime = ComparisonDatabase.getInstance().getMinTime();
 				int maxTime = ComparisonDatabase.getInstance().getMaxTime();
-				return new RankingResultVo(page(result, pageSize, pageNum), result.size(), minTime, maxTime);
+				return new RankingResultVo(page(targetReplySource, pageSize, pageNum), targetReplySource.size(),
+						minTime, maxTime);
 			} finally {
 				ComparisonDatabase.getInstance().readUnLock();
 				rwLock.readLock().unlock();
