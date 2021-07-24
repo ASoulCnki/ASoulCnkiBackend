@@ -1,6 +1,6 @@
 # A-SOUL评论区小作文 枝网查重系统 后端
 
-[![Publish Docker](https://github.com/ASoulCnki/ASoulCnkiBackend/actions/workflows/build-docker.yml/badge.svg?branch=master&event=registry_package)](https://github.com/ASoulCnki/ASoulCnkiBackend/actions/workflows/build-docker.yml)
+[![Publish Docker](https://github.com/ASoulCnki/ASoulCnkiBackend/actions/workflows/build-docker.yml/badge.svg?branch=master)](https://github.com/ASoulCnki/ASoulCnkiBackend/actions/workflows/build-docker.yml)
 
 源项目：https://github.com/ASoulCnki/ASoulCnki
 网站地址：https://asoulcnki.asia
