@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@CacheConfig(cacheNames = "caffeineCacheManager")
+@CacheConfig(cacheNames = "checkCache")
 public class ICheckServiceImpl implements ICheckService {
 	private final static Logger log = LoggerFactory.getLogger(ICheckServiceImpl.class);
 

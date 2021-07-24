@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.function.Predicate;
 
 @Service
-@CacheConfig(cacheNames = "caffeineCacheManager")
+@CacheConfig(cacheNames = "rankCache")
 public class IRankingServiceImpl implements IRankingService {
 
 	@Override
@@ -56,7 +56,7 @@ public class IRankingServiceImpl implements IRankingService {
 	}
 
 	@Override
-	@CacheEvict(value = "leaderboard")
+	@CacheEvict(value = "leaderboard", allEntries = true)
 	public void refresh() {
 		LeaderBoard.getInstance().refresh();
 	}

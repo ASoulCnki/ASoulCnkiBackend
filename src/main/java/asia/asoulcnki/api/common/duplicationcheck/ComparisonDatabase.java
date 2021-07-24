@@ -30,14 +30,12 @@ public class ComparisonDatabase {
 
 	private int minTime;
 	private int maxTime;
-	private long maxRpid;
 	// reply id -> reply
 	private Map<Long, Reply> replyMap;
 	//  text hash -> reply ids
 	private Map<Long, ArrayList<Long>> textHashMap;
 
 	private ComparisonDatabase() {
-		this.maxRpid = 0;
 		this.minTime = Integer.MAX_VALUE;
 		this.maxTime = 0;
 		this.rwLock = new ReentrantReadWriteLock();
@@ -90,7 +88,7 @@ public class ComparisonDatabase {
 	}
 
 	// return: key-> rpid, value -> hit count
-	public static List<Map.Entry<Long, Integer>> searchRelatedReplies(ArrayList<Long> textHashList, int minHit) {
+	public static List<Map.Entry<Long, Integer>> searchRelatedReplies(List<Long> textHashList, int minHit) {
 		float threshold = (float) (textHashList.size() * 0.2);
 		if (threshold <= minHit) {
 			threshold = minHit;
@@ -98,7 +96,7 @@ public class ComparisonDatabase {
 		return searchRelatedReplies(textHashList, threshold);
 	}
 
-	public static List<Map.Entry<Long, Integer>> searchRelatedReplies(ArrayList<Long> textHashList, float threshold) {
+	public static List<Map.Entry<Long, Integer>> searchRelatedReplies(List<Long> textHashList, float threshold) {
 		Map<Long, Integer> replyHitMap = new HashMap<>();
 		for (Long textHash : textHashList) {
 			ArrayList<Long> hitReplyIds = ComparisonDatabase.getInstance().searchHash(textHash);
@@ -152,7 +150,6 @@ public class ComparisonDatabase {
 	public void reset() {
 		this.writeLock();
 		try {
-			this.maxRpid = 0;
 			this.minTime = Integer.MAX_VALUE;
 			this.maxTime = 0;
 			this.replyMap = new HashMap<>(initialCapacity);
@@ -169,8 +166,8 @@ public class ComparisonDatabase {
 
 		Reply oldReply = replyMap.get(reply.getRpid());
 
+		// update related like sum
 		if (oldReply != null && oldReply.getLikeNum() != reply.getLikeNum()) {
-			// update related like sum
 			if (oldReply.getOriginRpid() >= 0) {
 				Reply relatedReply = replyMap.get(oldReply.getOriginRpid());
 				int likeSum = relatedReply.getSimilarLikeSum();
@@ -182,53 +179,27 @@ public class ComparisonDatabase {
 
 		String content = ArticleCompareUtil.trim(reply.getContent());
 		int codePointCount = content.codePointCount(0, content.length());
-
-		if (codePointCount < SummaryHash.DEFAULT_K) {
+		// content is too short or content is chessboard
+		if (codePointCount < SummaryHash.DEFAULT_K || isChess(content)) {
 			return;
 		}
 
-		// we don't process chess 😈
-		if (content.contains("┼┼┼┼┼┼┼┼") || content.contains("┏┯┯┯┯┯┯┯┯┯┓") || content.contains("┏┯┯┯┯┯┯┯┯┯┯┯┯┯┯┯┯┓")) {
-			return;
+		// calculate text hashes
+		ArrayList<Long> textHashList = SummaryHash.defaultHash(content);
+
+		// calculate if
+		if (codePointCount > 30) {
+			calculateIf(reply, content, textHashList);
 		}
 
+		// add reply to map and update stats
 		this.replyMap.put(reply.getRpid(), reply);
-
 		if (reply.getCtime() > this.maxTime) {
 			this.maxTime = reply.getCtime();
 		}
 		if (reply.getCtime() < this.minTime) {
 			this.minTime = reply.getCtime();
 		}
-		if (reply.getRpid() > this.maxRpid) {
-			this.maxRpid = reply.getRpid();
-		}
-
-		ArrayList<Long> textHashList = SummaryHash.defaultHash(content);
-
-		// calculate IF
-		if (codePointCount > 30) {
-			// key-> rpid, value -> hit count
-			List<Map.Entry<Long, Integer>> sortedRelatedReplies = searchRelatedReplies(textHashList, 2);
-
-			for (Map.Entry<Long, Integer> entry : sortedRelatedReplies) {
-				Reply relatedReply = this.getReply(entry.getKey());
-				// we only process original reply
-				if (relatedReply.getOriginRpid() >= 0) {
-					continue;
-				}
-				String relatedContent = ArticleCompareUtil.trim(relatedReply.getContent());
-				int relatedContentLength = ArticleCompareUtil.textLength(relatedContent);
-				float similarity = ArticleCompareUtil.compareArticle(content, relatedContent);
-				if (ArticleCompareUtil.isHighSimilarity(relatedContentLength, similarity)) {
-					reply.setOriginRpid(relatedReply.getRpid());
-					relatedReply.setSimilarCount(relatedReply.getSimilarCount() + 1);
-					relatedReply.setSimilarLikeSum(reply.getLikeNum() + relatedReply.getSimilarLikeSum());
-					break;
-				}
-			}
-		}
-
 		if (reply.getOriginRpid() < 0) {
 			reply.setSimilarLikeSum(reply.getLikeNum());
 		}
@@ -243,6 +214,33 @@ public class ComparisonDatabase {
 
 		if (replyMap.size() % 20000 == 0) {
 			log.info("reply size: {}", replyMap.size());
+		}
+	}
+
+	private boolean isChess(String content) {
+		// we don't process chess 😈
+		return content.contains("┼┼┼┼┼┼┼┼") || content.contains("┏┯┯┯┯┯┯┯┯┯┓") || content.contains(
+				"┏┯┯┯┯┯┯┯┯┯┯┯┯┯┯┯┯┓");
+	}
+
+	private void calculateIf(Reply reply, String content, List<Long> textHashList) {
+		// key-> rpid, value -> hit count
+		List<Map.Entry<Long, Integer>> sortedRelatedReplies = searchRelatedReplies(textHashList, 2);
+
+		for (Map.Entry<Long, Integer> entry : sortedRelatedReplies) {
+			Reply relatedReply = this.getReply(entry.getKey());
+			// find first original reply
+			if (relatedReply.getOriginRpid() < 0) {
+				String relatedContent = ArticleCompareUtil.trim(relatedReply.getContent());
+				int relatedContentLength = ArticleCompareUtil.textLength(relatedContent);
+				float similarity = ArticleCompareUtil.compareArticle(content, relatedContent);
+				if (ArticleCompareUtil.isHighSimilarity(relatedContentLength, similarity)) {
+					reply.setOriginRpid(relatedReply.getRpid());
+					relatedReply.setSimilarCount(relatedReply.getSimilarCount() + 1);
+					relatedReply.setSimilarLikeSum(reply.getLikeNum() + relatedReply.getSimilarLikeSum());
+				}
+				break;
+			}
 		}
 	}
 

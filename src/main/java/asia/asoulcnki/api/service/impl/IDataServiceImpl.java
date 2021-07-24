@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Service
-@CacheConfig(cacheNames = "caffeineCacheManager")
+@CacheConfig(cacheNames = "checkCache")
 public class IDataServiceImpl implements IDataService {
 	private final static Logger log = LoggerFactory.getLogger(IDataServiceImpl.class);
 	@Autowired
