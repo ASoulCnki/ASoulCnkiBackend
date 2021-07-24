@@ -1,6 +1,8 @@
 # A-SOUL评论区小作文 枝网查重系统 后端
 
-源项目：https://github.com/stream2000/ASoulCnki
+[![Publish Docker](https://github.com/ASoulCnki/ASoulCnkiBackend/actions/workflows/build-docker.yml/badge.svg?branch=master&event=registry_package)](https://github.com/ASoulCnki/ASoulCnkiBackend/actions/workflows/build-docker.yml)
+
+源项目：https://github.com/ASoulCnki/ASoulCnki
 网站地址：https://asoulcnki.asia
 
 ## 部署
@@ -48,7 +50,11 @@ sh bin/cleanup.sh
 #### 2.3 使用docker运行
 
 ```shell
-mvn clean package docker:build # 构建镜像
+# 构建镜像
+mvn clean package docker:build
+# 或者
+# docker pull registry.cn-hangzhou.aliyuncs.com/asoulcnki/api:latest
+
 docker run -e PROFILES=demo -d -v host-path-to-data-dir:/opt/data registry.cn-hangzhou.aliyuncs.com/asoulcnki/api:latest
  # 启动docker
 ```
