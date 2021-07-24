@@ -94,17 +94,10 @@ public class LeaderBoard {
 			}
 
 			int recordCount = list.size();
-			int pageCount;
-
-			if (recordCount % pageSize == 0) {
-				pageCount = recordCount / pageSize;
-			} else {
-				pageCount = recordCount / pageSize + 1;
-			}
-
+			int pageCount = recordCount % pageSize == 0 ? recordCount / pageSize : recordCount / pageSize + 1;
 
 			int fromIndex; //开始索引
-			int toIndex = 0; //结束索引
+			int toIndex; //结束索引
 
 			if (pageNum > pageCount) {
 				pageNum = pageCount;
@@ -115,6 +108,7 @@ public class LeaderBoard {
 				toIndex = fromIndex + pageSize;
 			} else {
 				fromIndex = (pageNum - 1) * pageSize;
+				toIndex = recordCount;
 			}
 
 			return list.subList(fromIndex, toIndex);

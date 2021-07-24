@@ -7,9 +7,9 @@ import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
 import asia.asoulcnki.api.common.duplicationcheck.SummaryHash;
 import asia.asoulcnki.api.common.response.CnkiCommonEnum;
 import asia.asoulcnki.api.persistence.entity.Reply;
-import asia.asoulcnki.api.service.ICheckService;
 import asia.asoulcnki.api.persistence.vo.CheckResultVo;
 import asia.asoulcnki.api.persistence.vo.CheckResultVo.RelatedReply;
+import asia.asoulcnki.api.service.ICheckService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,6 @@ import java.util.Map;
 @CacheConfig(cacheNames = "checkCache")
 public class ICheckServiceImpl implements ICheckService {
 	private final static Logger log = LoggerFactory.getLogger(ICheckServiceImpl.class);
-
 
 	@Override
 	public CheckResultVo check(String text) {

@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.function.Predicate;
 
 @Service
-@CacheConfig(cacheNames = "rankCache")
+@CacheConfig(cacheNames = "checkCache")
 public class IRankingServiceImpl implements IRankingService {
 
 	@Override
