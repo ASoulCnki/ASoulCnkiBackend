@@ -139,6 +139,7 @@ public class IDataServiceImpl implements IDataService {
 	@Override
 	@CacheEvict(value = "replyCache", allEntries = true)
 	public ControlResultVo train() {
+		ComparisonDatabase.getInstance().writeLock();
 		try {
 			long start = System.currentTimeMillis();
 			List<Reply> node = getJsonFile("data/bilibili_cnki_reply.json");
@@ -151,7 +152,10 @@ public class IDataServiceImpl implements IDataService {
 			}
 			log.info("train end cost {} ms", System.currentTimeMillis() - start);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new BizException(CnkiCommonEnum.INTERNAL_SERVER_ERROR, e);
+		} finally {
+			ComparisonDatabase.getInstance().writeUnLock();
 		}
 		return checkpoint();
 	}
