@@ -1,10 +1,12 @@
 package asia.asoulcnki.api.service;
 
+import java.util.List;
+
 import asia.asoulcnki.api.persistence.vo.RankingResultVo;
 
 public interface IRankingService {
-	RankingResultVo queryRankings(SortMethodEnum sortMethod, final TimeRangeEnum timeRange, final int pageSize,
-			final int pageNum);
+	RankingResultVo queryRankings(SortMethodEnum sortMethod, final TimeRangeEnum timeRange, List<Integer> userIDs,
+            final int pageSize,final int pageNum);
 
 	void refresh();
 

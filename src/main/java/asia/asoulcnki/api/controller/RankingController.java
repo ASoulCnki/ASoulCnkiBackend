@@ -5,6 +5,9 @@ import asia.asoulcnki.api.persistence.vo.RankingResultVo;
 import asia.asoulcnki.api.service.IRankingService;
 import asia.asoulcnki.api.service.IRankingService.SortMethodEnum;
 import asia.asoulcnki.api.service.IRankingService.TimeRangeEnum;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +29,7 @@ public class RankingController {
 	@GetMapping("/")
 	@ResponseBody
 	public ApiResult<RankingResultVo> getRankingResult(@RequestParam int sortMode, @RequestParam int timeRangeMode,
-			@RequestParam int pageSize, @RequestParam int pageNum) {
+			@RequestParam("id") List<Integer> userIDs, @RequestParam int pageSize, @RequestParam int pageNum) {
 		SortMethodEnum sortMethod = SortMethodEnum.DEFAULT;
 		switch (sortMode) {
 		case 1:
@@ -47,7 +50,7 @@ public class RankingController {
 			break;
 		}
 
-		return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, pageSize, pageNum));
+		return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, userIDs, pageSize, pageNum));
 	}
 
 }

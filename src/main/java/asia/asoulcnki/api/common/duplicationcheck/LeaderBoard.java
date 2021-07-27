@@ -6,6 +6,7 @@ import asia.asoulcnki.api.service.IRankingService.TimeRangeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -165,7 +166,7 @@ public class LeaderBoard {
 			}
 		}
 
-		public RankingResultVo query(TimeRangeEnum timeRange, int pageSize, int pageNum) {
+		public RankingResultVo query(TimeRangeEnum timeRange, List<Integer> userIDs,int pageSize, int pageNum) {
 			ComparisonDatabase.getInstance().readLock();
 			rwLock.readLock().lock();
 			try {
@@ -186,8 +187,11 @@ public class LeaderBoard {
 
 				int minTime = ComparisonDatabase.getInstance().getMinTime();
 				int maxTime = ComparisonDatabase.getInstance().getMaxTime();
-				return new RankingResultVo(page(targetReplySource, pageSize, pageNum), targetReplySource.size(),
-						minTime, maxTime);
+
+                List<Reply> replies = page(targetReplySource, pageSize, pageNum);
+                replies.removeIf(FilterRules.userIDIn(userIDs));
+                
+				return new RankingResultVo(replies, targetReplySource.size(), minTime, maxTime);
 			} finally {
 				ComparisonDatabase.getInstance().readUnLock();
 				rwLock.readLock().unlock();
