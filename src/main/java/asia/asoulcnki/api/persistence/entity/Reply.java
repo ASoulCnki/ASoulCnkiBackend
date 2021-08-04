@@ -32,6 +32,9 @@ public class Reply implements Serializable {
 	@JsonProperty("mid")
 	private int mid;
 
+    @JsonProperty("user_id")
+    private long userID;
+
 	@JsonProperty("oid")
 	@JsonSerialize(using = ToStringSerializer.class)
 	private long oid;

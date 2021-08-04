@@ -5,7 +5,6 @@ import asia.asoulcnki.api.common.duplicationcheck.LeaderBoard.LeaderBoardEntry;
 import asia.asoulcnki.api.persistence.vo.RankingResultVo;
 import asia.asoulcnki.api.service.IRankingService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.cache.annotation.CacheConfig;
@@ -25,21 +24,21 @@ public class IRankingServiceImpl implements IRankingService {
 
 		switch (sortMethod) {
 		case SIMILAR_COUNT:
-			leaderBoard = LeaderBoard.getInstance().getSimilarCountLeaderBoard();
+			leaderBoard = LeaderBoard.getInstance(userIDs).getSimilarCountLeaderBoard();
 			break;
 		case LIKE_NUM:
-			leaderBoard = LeaderBoard.getInstance().getLikeLeaderBoard();
+			leaderBoard = LeaderBoard.getInstance(userIDs).getLikeLeaderBoard();
 			break;
 		default:
-			leaderBoard = LeaderBoard.getInstance().getSimilarLikeSumLeaderboard();
+			leaderBoard = LeaderBoard.getInstance(userIDs).getSimilarLikeSumLeaderboard();
 		}
 
-		return leaderBoard.query(timeRange, userIDs, pageSize, pageNum);
+		return leaderBoard.query(timeRange ,pageSize, pageNum);
 	}
 
 	@Override
 	@CacheEvict(value = "leaderboard", allEntries = true)
 	public void refresh() {
-		LeaderBoard.getInstance().refresh();
+		LeaderBoard.getInstance(null).refresh();
 	}
 }

@@ -28,9 +28,10 @@ public class RankingController {
 
 	@GetMapping("/")
 	@ResponseBody
-	public ApiResult<RankingResultVo> getRankingResult(@RequestParam int sortMode, @RequestParam int timeRangeMode,
-			@RequestParam("id") List<Integer> userIDs, @RequestParam int pageSize, @RequestParam int pageNum) {
-		SortMethodEnum sortMethod = SortMethodEnum.DEFAULT;
+	public ApiResult<RankingResultVo> getRankingResult(@RequestParam int sortMode, @RequestParam int timeRangeMode, 
+            @RequestParam(value = "id", required = false) List<Integer> ids, @RequestParam int pageSize, @RequestParam int pageNum) {
+       
+        SortMethodEnum sortMethod = SortMethodEnum.DEFAULT;
 		switch (sortMode) {
 		case 1:
 			sortMethod = SortMethodEnum.LIKE_NUM;
@@ -50,7 +51,7 @@ public class RankingController {
 			break;
 		}
 
-		return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, userIDs, pageSize, pageNum));
+		return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, ids, pageSize, pageNum));
 	}
 
 }

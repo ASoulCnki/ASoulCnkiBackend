@@ -6,7 +6,7 @@ import asia.asoulcnki.api.persistence.vo.RankingResultVo;
 
 public interface IRankingService {
 	RankingResultVo queryRankings(SortMethodEnum sortMethod, final TimeRangeEnum timeRange, List<Integer> userIDs,
-            final int pageSize,final int pageNum);
+            final int pageSize, final int pageNum);
 
 	void refresh();
 

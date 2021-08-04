@@ -22,10 +22,10 @@ create table kv_store (
 drop table if exists reply;
 create table reply (
     `rpid`       bigint comment '回复id',
-    /** `type_id`    int, */
+    `type_id`    int,
     `dynamic_id` bigint,
     `mid`        int comment '成员id',
-    /** `oid`        bigint comment '源稿件id', */
+    `oid`        bigint comment '源稿件id',
     `ctime`      int comment '创建时间',
     `m_name`     varchar(255) comment '昵称',
     `content`    text comment '评论内容',

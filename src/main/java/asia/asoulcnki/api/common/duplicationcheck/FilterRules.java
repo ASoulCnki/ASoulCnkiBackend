@@ -21,7 +21,7 @@ public class FilterRules {
 	}
 
 	public static Predicate<Reply> alwaysTrue(int threshold) {
-		return r -> true;
+		return r -> false;
 	}
 
     public static Predicate<Reply> userIDIn(List<Integer> userIDs) {
@@ -29,7 +29,7 @@ public class FilterRules {
             @Override
             public boolean test(Reply reply) {
                 for (int id : userIDs) {
-                    if (reply.getMid() == id) {
+                    if (reply.getUserID() == id) {
                         return true;
                     }
                 }
