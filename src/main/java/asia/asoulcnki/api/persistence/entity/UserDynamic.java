@@ -2,6 +2,7 @@ package asia.asoulcnki.api.persistence.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,4 +26,7 @@ public class UserDynamic implements Serializable {
 
 	@JsonProperty("status")
 	private int status;
+
+    @JsonProperty("user_id")
+    private long userID;
 }

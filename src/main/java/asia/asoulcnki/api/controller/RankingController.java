@@ -1,10 +1,16 @@
 package asia.asoulcnki.api.controller;
 
+import asia.asoulcnki.api.common.duplicationcheck.FilterRules;
 import asia.asoulcnki.api.common.response.ApiResult;
+import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.vo.RankingResultVo;
 import asia.asoulcnki.api.service.IRankingService;
 import asia.asoulcnki.api.service.IRankingService.SortMethodEnum;
 import asia.asoulcnki.api.service.IRankingService.TimeRangeEnum;
+
+import java.util.List;
+import java.util.function.Predicate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.validation.annotation.Validated;
@@ -25,9 +31,10 @@ public class RankingController {
 
 	@GetMapping("/")
 	@ResponseBody
-	public ApiResult<RankingResultVo> getRankingResult(@RequestParam int sortMode, @RequestParam int timeRangeMode,
-			@RequestParam int pageSize, @RequestParam int pageNum) {
-		SortMethodEnum sortMethod = SortMethodEnum.DEFAULT;
+	public ApiResult<RankingResultVo> getRankingResult(@RequestParam int sortMode, @RequestParam int timeRangeMode, 
+            @RequestParam(value = "id", required = false) List<Integer> ids, @RequestParam int pageSize, @RequestParam int pageNum) {
+       
+        SortMethodEnum sortMethod = SortMethodEnum.DEFAULT;
 		switch (sortMode) {
 		case 1:
 			sortMethod = SortMethodEnum.LIKE_NUM;
@@ -47,7 +54,9 @@ public class RankingController {
 			break;
 		}
 
-		return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, pageSize, pageNum));
+        Predicate<Reply> filter = FilterRules.userIDIn(ids);
+
+		return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, filter, pageSize, pageNum));
 	}
 
 }

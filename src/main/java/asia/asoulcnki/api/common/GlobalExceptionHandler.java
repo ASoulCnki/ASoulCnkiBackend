@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(value = BizException.class)
 	@ResponseBody
-	public ApiResult bizExceptionHandler(HttpServletRequest req, BizException e) {
+	public <T> ApiResult<T> bizExceptionHandler(HttpServletRequest req, BizException e) {
 		logger.error("Business exception, caused by {} ", e.getErrorMsg());
 		e.printStackTrace();
 		return ApiResult.error(e.getErrorCode(), e.getErrorMsg());
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(value = Exception.class)
 	@ResponseBody
-	public ApiResult exceptionHandler(HttpServletRequest req, Exception e) {
+	public <T> ApiResult<T> exceptionHandler(HttpServletRequest req, Exception e) {
 		int errorCode;
 		String errorMsg;
 		if (e instanceof ConstraintViolationException) {
