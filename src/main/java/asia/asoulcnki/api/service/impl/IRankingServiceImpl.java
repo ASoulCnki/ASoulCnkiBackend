@@ -34,7 +34,7 @@ public class IRankingServiceImpl implements IRankingService {
 			leaderBoard = LeaderBoard.getInstance().getSimilarLikeSumLeaderboard();
 		}
 
-		return leaderBoard.query(filter , timeRange ,pageSize, pageNum);
+		return leaderBoard.query(filter, timeRange, pageSize, pageNum);
 	}
 
 	@Override

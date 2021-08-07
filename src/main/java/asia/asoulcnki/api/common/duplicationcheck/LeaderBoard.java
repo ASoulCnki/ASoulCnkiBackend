@@ -97,8 +97,6 @@ public class LeaderBoard {
 	}
 
 	public LeaderBoardEntry getSimilarLikeSumLeaderboard() {
-        similarLikeSumLeaderboard.refresh();
-
 		return similarLikeSumLeaderboard;
 	}
 
@@ -163,7 +161,7 @@ public class LeaderBoard {
 				c.add(Calendar.DATE, -3);
 				timePredicate = r -> r.getCtime() * 1000L >= c.getTime().getTime();
 				repliesInThreeDays = ComparisonDatabase.getInstance().getReplyMap().values().stream(). //
-						filter(repliesInThreeDaysFilter.and(timePredicate)).sorted(comparator).collect(Collectors.toList());      
+						filter(repliesInThreeDaysFilter.and(timePredicate)).sorted(comparator).collect(Collectors.toList());
             } finally {
 				ComparisonDatabase.getInstance().readUnLock();
 				rwLock.writeLock().unlock();
@@ -191,13 +189,13 @@ public class LeaderBoard {
                     break;
 				}
 
-                targetReplySource.removeIf(filter);
+                List<Reply> result = targetReplySource.stream().filter(filter).collect(Collectors.toList());
 
 				int minTime = ComparisonDatabase.getInstance().getMinTime();
 				int maxTime = ComparisonDatabase.getInstance().getMaxTime();
                 
                 List<Reply> replies = new ArrayList<>();
-                replies.addAll(page(targetReplySource, pageSize, pageNum));
+                replies.addAll(page(result, pageSize, pageNum));
                 
 				return new RankingResultVo(replies, targetReplySource.size(), minTime, maxTime);
 			} finally {
