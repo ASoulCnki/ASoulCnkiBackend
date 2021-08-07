@@ -1,12 +1,15 @@
 package asia.asoulcnki.api.controller;
 
+import asia.asoulcnki.api.common.duplicationcheck.FilterRules;
 import asia.asoulcnki.api.common.response.ApiResult;
+import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.vo.RankingResultVo;
 import asia.asoulcnki.api.service.IRankingService;
 import asia.asoulcnki.api.service.IRankingService.SortMethodEnum;
 import asia.asoulcnki.api.service.IRankingService.TimeRangeEnum;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -51,7 +54,9 @@ public class RankingController {
 			break;
 		}
 
-		return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, ids, pageSize, pageNum));
+        Predicate<Reply> filter = FilterRules.userIDIn(ids);
+
+		return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, filter, pageSize, pageNum));
 	}
 
 }

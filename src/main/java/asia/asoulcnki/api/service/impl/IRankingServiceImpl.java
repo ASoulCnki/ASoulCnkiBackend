@@ -2,10 +2,11 @@ package asia.asoulcnki.api.service.impl;
 
 import asia.asoulcnki.api.common.duplicationcheck.LeaderBoard;
 import asia.asoulcnki.api.common.duplicationcheck.LeaderBoard.LeaderBoardEntry;
+import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.vo.RankingResultVo;
 import asia.asoulcnki.api.service.IRankingService;
 
-import java.util.List;
+import java.util.function.Predicate;
 
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -19,26 +20,26 @@ public class IRankingServiceImpl implements IRankingService {
 	@Override
 	@Cacheable(value = "leaderboard")
 	public RankingResultVo queryRankings(final SortMethodEnum sortMethod, final TimeRangeEnum timeRange,
-			final List<Integer> userIDs ,final int pageSize, final int pageNum) {
+			final Predicate<Reply> filter, final int pageSize, final int pageNum) {
 		LeaderBoardEntry leaderBoard;
 
 		switch (sortMethod) {
 		case SIMILAR_COUNT:
-			leaderBoard = LeaderBoard.getInstance(userIDs).getSimilarCountLeaderBoard();
+			leaderBoard = LeaderBoard.getInstance().getSimilarCountLeaderBoard();
 			break;
 		case LIKE_NUM:
-			leaderBoard = LeaderBoard.getInstance(userIDs).getLikeLeaderBoard();
+			leaderBoard = LeaderBoard.getInstance().getLikeLeaderBoard();
 			break;
 		default:
-			leaderBoard = LeaderBoard.getInstance(userIDs).getSimilarLikeSumLeaderboard();
+			leaderBoard = LeaderBoard.getInstance().getSimilarLikeSumLeaderboard();
 		}
 
-		return leaderBoard.query(timeRange ,pageSize, pageNum);
+		return leaderBoard.query(filter , timeRange ,pageSize, pageNum);
 	}
 
 	@Override
 	@CacheEvict(value = "leaderboard", allEntries = true)
 	public void refresh() {
-		LeaderBoard.getInstance(null).refresh();
+		LeaderBoard.getInstance().refresh();
 	}
 }

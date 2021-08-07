@@ -22,8 +22,6 @@ public class LeaderBoard {
 
 	private final static Logger log = LoggerFactory.getLogger(LeaderBoard.class);
 
-    private List<Integer> userIDs;
-
 	private static LeaderBoard instance;
 	// 累积赞数排序，至少为50，且引用次数至少为1
 	private final LeaderBoardEntry similarLikeSumLeaderboard;
@@ -32,23 +30,19 @@ public class LeaderBoard {
 	// 引用次数排序，至少为5
 	private final LeaderBoardEntry similarCountLeaderBoard;
 
-	private LeaderBoard(List<Integer> userIDs) {
-        this.userIDs = userIDs;
+	private LeaderBoard() {
 
 		similarLikeSumLeaderboard = new LeaderBoardEntry(Comparator.comparing(Reply::getSimilarLikeSum).reversed());
-		similarLikeSumLeaderboard.setRepliesInUsersFilter(this.userIDs);
         similarLikeSumLeaderboard.setAllRepliesFilter(FilterRules.similarLikeSumGreaterThan(100).and(FilterRules.similarLikeCountGreaterThan(1)));
 		similarLikeSumLeaderboard.setRepliesInOneWeekFilter(FilterRules.similarLikeSumGreaterThan(80).and(FilterRules.similarLikeCountGreaterThan(0)));
 		similarLikeSumLeaderboard.setRepliesInThreeDaysFilter(FilterRules.similarLikeSumGreaterThan(50).and(FilterRules.similarLikeCountGreaterThan(0)));
 
 		likeLeaderBoard = new LeaderBoardEntry(Comparator.comparing(Reply::getLikeNum).reversed());
-		likeLeaderBoard.setRepliesInUsersFilter(this.userIDs);
         likeLeaderBoard.setAllRepliesFilter(FilterRules.likeNumGreaterThan(300));
 		likeLeaderBoard.setRepliesInOneWeekFilter(FilterRules.likeNumGreaterThan(150));
 		likeLeaderBoard.setRepliesInThreeDaysFilter(FilterRules.likeNumGreaterThan(100));
 
 		similarCountLeaderBoard = new LeaderBoardEntry(Comparator.comparing(Reply::getSimilarCount).reversed());
-		similarCountLeaderBoard.setRepliesInUsersFilter(this.userIDs);
         similarCountLeaderBoard.setAllRepliesFilter(FilterRules.similarLikeCountGreaterThan(5));
 		similarCountLeaderBoard.setRepliesInOneWeekFilter(FilterRules.similarLikeCountGreaterThan(1));
 		similarCountLeaderBoard.setRepliesInThreeDaysFilter(FilterRules.similarLikeCountGreaterThan(0));
@@ -56,15 +50,13 @@ public class LeaderBoard {
 		refresh();
 	}
 
-	public static synchronized LeaderBoard getInstance(List<Integer> userIDs) {
+	public static synchronized LeaderBoard getInstance() {
 		if (instance == null) {
 			synchronized (LeaderBoard.class) {
-				instance = new LeaderBoard(userIDs);
+                instance = new LeaderBoard();
                 return instance;
 			}
-		}
-        instance.setUserIDs(userIDs);
-        instance.refresh();
+        }
 		return instance;
 	}
 
@@ -105,6 +97,8 @@ public class LeaderBoard {
 	}
 
 	public LeaderBoardEntry getSimilarLikeSumLeaderboard() {
+        similarLikeSumLeaderboard.refresh();
+
 		return similarLikeSumLeaderboard;
 	}
 
@@ -116,18 +110,9 @@ public class LeaderBoard {
 		return similarCountLeaderBoard;
 	}
 
-    public void setUserIDs(List<Integer> userIDs) {
-        this.userIDs = userIDs;
-    }
-
 	public void refresh() {
-        similarCountLeaderBoard.setRepliesInUsersFilter(this.userIDs);
 		similarCountLeaderBoard.refresh();
-
-        likeLeaderBoard.setRepliesInUsersFilter(this.userIDs);
 		likeLeaderBoard.refresh();
-
-        similarLikeSumLeaderboard.setRepliesInUsersFilter(this.userIDs);
 		similarLikeSumLeaderboard.refresh();
 	}
 
@@ -140,7 +125,6 @@ public class LeaderBoard {
 		private Predicate<Reply> allRepliesFilter;
 		private Predicate<Reply> repliesInOneWeekFilter;
 		private Predicate<Reply> repliesInThreeDaysFilter;
-        private Predicate<Reply> repliesInUsersFilter;
 
 		private LeaderBoardEntry(final Comparator<Reply> comparator) {
 			this.comparator = comparator;
@@ -159,14 +143,6 @@ public class LeaderBoard {
 			this.repliesInOneWeekFilter = repliesInOneWeekFilter;
 		}
 
-        public void setRepliesInUsersFilter(List<Integer> users) {
-            if (users == null) {
-                this.repliesInUsersFilter = FilterRules.alwaysTrue(0);
-                return;
-            }
-            this.repliesInUsersFilter = FilterRules.userIDIn(users);
-        }
-
 		void refresh() {
 			ComparisonDatabase.getInstance().readLock();
 			rwLock.writeLock().lock();
@@ -174,8 +150,6 @@ public class LeaderBoard {
 
 				allReplies = ComparisonDatabase.getInstance().getReplyMap().values().stream(). //
 						filter(allRepliesFilter).sorted(comparator).collect(Collectors.toList());
-
-                allReplies.removeIf(repliesInUsersFilter);
 
 				Calendar c = Calendar.getInstance();
 				Date maxTime = new Date(ComparisonDatabase.getInstance().getMaxTime() * 1000L);
@@ -196,7 +170,7 @@ public class LeaderBoard {
 			}
 		}
 
-		public RankingResultVo query(TimeRangeEnum timeRange, int pageSize, int pageNum) {
+		public RankingResultVo query(Predicate<Reply> filter, TimeRangeEnum timeRange, int pageSize, int pageNum) {
 			ComparisonDatabase.getInstance().readLock();
 			rwLock.readLock().lock();
 			try {
@@ -213,7 +187,11 @@ public class LeaderBoard {
 				case THREE_DAYS:
 					targetReplySource = repliesInThreeDays;
 					break;
+                default:
+                    break;
 				}
+
+                targetReplySource.removeIf(filter);
 
 				int minTime = ComparisonDatabase.getInstance().getMinTime();
 				int maxTime = ComparisonDatabase.getInstance().getMaxTime();

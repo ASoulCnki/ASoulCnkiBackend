@@ -5,7 +5,7 @@ use bilibili_cnki;
 drop table if exists user_dynamic;
 create table user_dynamic (
     `dynamic_id` bigint comment '动态唯一 id',
-    `user_id`    bigint comment '用户 id',
+    `uid`        bigint comment '用户 id',
     `type_id`    int comment '动态类型, 用于获取评论',
     `oid`        bigint comment '评论区 id',
     `status`     int comment '评论爬取状态，0: 未爬取， 1: 至少爬取完成过一次',
@@ -22,6 +22,7 @@ create table kv_store (
 drop table if exists reply;
 create table reply (
     `rpid`       bigint comment '回复id',
+    `uid`        bigint,
     `type_id`    int,
     `dynamic_id` bigint,
     `mid`        int comment '成员id',

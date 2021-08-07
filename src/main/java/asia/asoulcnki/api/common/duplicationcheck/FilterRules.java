@@ -21,15 +21,19 @@ public class FilterRules {
 	}
 
 	public static Predicate<Reply> alwaysTrue(int threshold) {
-		return r -> false;
+		return r -> true;
 	}
 
     public static Predicate<Reply> userIDIn(List<Integer> userIDs) {
         Predicate<Reply> userPredicate = new Predicate<Reply>() {
             @Override
             public boolean test(Reply reply) {
+                if (userIDs == null) {
+                    return false;
+                }
+
                 for (int id : userIDs) {
-                    if (reply.getUserID() == id) {
+                    if (reply.getUid() == id) {
                         return true;
                     }
                 }
