@@ -7,12 +7,7 @@ import asia.asoulcnki.api.persistence.vo.RankingResultVo;
 import asia.asoulcnki.api.service.IRankingService;
 import asia.asoulcnki.api.service.IRankingService.SortMethodEnum;
 import asia.asoulcnki.api.service.IRankingService.TimeRangeEnum;
-
-import java.util.List;
-import java.util.function.Predicate;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.function.Predicate;
+
 @RestController
 @RequestMapping("/ranking")
 @Validated
-@CacheConfig(cacheNames = "caffeineCacheManager")
 public class RankingController {
 
 	@Autowired

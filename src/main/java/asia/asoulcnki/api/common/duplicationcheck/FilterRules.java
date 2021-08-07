@@ -20,26 +20,23 @@ public class FilterRules {
 		return r -> r.getSimilarCount() > threshold;
 	}
 
-	public static Predicate<Reply> alwaysTrue(int threshold) {
+	public static Predicate<Reply> alwaysTrue() {
 		return r -> true;
 	}
 
-    public static Predicate<Reply> userIDIn(List<Integer> userIDs) {
-        Predicate<Reply> userPredicate = new Predicate<Reply>() {
-            @Override
-            public boolean test(Reply reply) {
-                if (userIDs == null) {
-                    return false;
-                }
+	public static Predicate<Reply> userIDIn(List<Integer> userIDs) {
+		return reply -> {
+			// default condition
+			if (userIDs == null || userIDs.isEmpty()) {
+				return true;
+			}
 
-                for (int id : userIDs) {
-                    if (reply.getUid() == id) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        };
-        return userPredicate;
-    }
+			for (int id : userIDs) {
+				if (reply.getUid() == id) {
+					return true;
+				}
+			}
+			return false;
+		};
+	}
 }

@@ -28,5 +28,5 @@ public class UserDynamic implements Serializable {
 	private int status;
 
     @JsonProperty("user_id")
-    private long userID;
+    private int userID;
 }

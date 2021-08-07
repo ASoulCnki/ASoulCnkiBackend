@@ -33,7 +33,7 @@ public class Reply implements Serializable {
 	private int mid;
 
     @JsonProperty("uid")
-    private long uid;
+    private int uid;
 
 	@JsonProperty("oid")
 	@JsonSerialize(using = ToStringSerializer.class)

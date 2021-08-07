@@ -3,11 +3,9 @@ package asia.asoulcnki.api.common.duplicationcheck;
 import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.vo.RankingResultVo;
 import asia.asoulcnki.api.service.IRankingService.TimeRangeEnum;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -33,17 +31,17 @@ public class LeaderBoard {
 	private LeaderBoard() {
 
 		similarLikeSumLeaderboard = new LeaderBoardEntry(Comparator.comparing(Reply::getSimilarLikeSum).reversed());
-        similarLikeSumLeaderboard.setAllRepliesFilter(FilterRules.similarLikeSumGreaterThan(100).and(FilterRules.similarLikeCountGreaterThan(1)));
+		similarLikeSumLeaderboard.setAllRepliesFilter(FilterRules.similarLikeSumGreaterThan(100).and(FilterRules.similarLikeCountGreaterThan(1)));
 		similarLikeSumLeaderboard.setRepliesInOneWeekFilter(FilterRules.similarLikeSumGreaterThan(80).and(FilterRules.similarLikeCountGreaterThan(0)));
 		similarLikeSumLeaderboard.setRepliesInThreeDaysFilter(FilterRules.similarLikeSumGreaterThan(50).and(FilterRules.similarLikeCountGreaterThan(0)));
 
 		likeLeaderBoard = new LeaderBoardEntry(Comparator.comparing(Reply::getLikeNum).reversed());
-        likeLeaderBoard.setAllRepliesFilter(FilterRules.likeNumGreaterThan(300));
+		likeLeaderBoard.setAllRepliesFilter(FilterRules.likeNumGreaterThan(300));
 		likeLeaderBoard.setRepliesInOneWeekFilter(FilterRules.likeNumGreaterThan(150));
 		likeLeaderBoard.setRepliesInThreeDaysFilter(FilterRules.likeNumGreaterThan(100));
 
 		similarCountLeaderBoard = new LeaderBoardEntry(Comparator.comparing(Reply::getSimilarCount).reversed());
-        similarCountLeaderBoard.setAllRepliesFilter(FilterRules.similarLikeCountGreaterThan(5));
+		similarCountLeaderBoard.setAllRepliesFilter(FilterRules.similarLikeCountGreaterThan(5));
 		similarCountLeaderBoard.setRepliesInOneWeekFilter(FilterRules.similarLikeCountGreaterThan(1));
 		similarCountLeaderBoard.setRepliesInThreeDaysFilter(FilterRules.similarLikeCountGreaterThan(0));
 
@@ -53,10 +51,11 @@ public class LeaderBoard {
 	public static synchronized LeaderBoard getInstance() {
 		if (instance == null) {
 			synchronized (LeaderBoard.class) {
-                instance = new LeaderBoard();
-                return instance;
+				if (instance == null) {
+					instance = new LeaderBoard();
+				}
 			}
-        }
+		}
 		return instance;
 	}
 
@@ -67,33 +66,6 @@ public class LeaderBoard {
 		calendar.set(Calendar.SECOND, 0);
 		long result = calendar.getTimeInMillis();
 		System.out.println(result / 1000);
-	}
-
-	public static <T> List<T> page(List<T> list, Integer pageSize, Integer pageNum) {
-		// now we only support page size as 10
-		if (list == null || list.isEmpty() || pageSize != 10) {
-			return null;
-		}
-
-		int recordCount = list.size();
-		int pageCount = recordCount % pageSize == 0 ? recordCount / pageSize : recordCount / pageSize + 1;
-
-		int fromIndex; //开始索引
-		int toIndex; //结束索引
-
-		if (pageNum > pageCount) {
-			pageNum = pageCount;
-		}
-
-		if (!pageNum.equals(pageCount)) {
-			fromIndex = (pageNum - 1) * pageSize;
-			toIndex = fromIndex + pageSize;
-		} else {
-			fromIndex = (pageNum - 1) * pageSize;
-			toIndex = recordCount;
-		}
-
-		return list.subList(fromIndex, toIndex);
 	}
 
 	public LeaderBoardEntry getSimilarLikeSumLeaderboard() {
@@ -162,7 +134,7 @@ public class LeaderBoard {
 				timePredicate = r -> r.getCtime() * 1000L >= c.getTime().getTime();
 				repliesInThreeDays = ComparisonDatabase.getInstance().getReplyMap().values().stream(). //
 						filter(repliesInThreeDaysFilter.and(timePredicate)).sorted(comparator).collect(Collectors.toList());
-            } finally {
+			} finally {
 				ComparisonDatabase.getInstance().readUnLock();
 				rwLock.writeLock().unlock();
 			}
@@ -185,19 +157,27 @@ public class LeaderBoard {
 				case THREE_DAYS:
 					targetReplySource = repliesInThreeDays;
 					break;
-                default:
-                    break;
+				default:
+					break;
 				}
-
-                List<Reply> result = targetReplySource.stream().filter(filter).collect(Collectors.toList());
 
 				int minTime = ComparisonDatabase.getInstance().getMinTime();
 				int maxTime = ComparisonDatabase.getInstance().getMaxTime();
-                
-                List<Reply> replies = new ArrayList<>();
-                replies.addAll(page(result, pageSize, pageNum));
-                
-				return new RankingResultVo(replies, targetReplySource.size(), minTime, maxTime);
+
+				int recordCount = targetReplySource.size();
+				int pageCount = recordCount % pageSize == 0 ? recordCount / pageSize : recordCount / pageSize + 1;
+
+				if (pageNum > pageCount) {
+					pageNum = pageCount;
+				}
+
+				int fromIndex = (pageNum - 1) * pageSize;
+
+				List<Reply> result = targetReplySource.stream().filter(filter). //
+						skip(fromIndex).limit(pageSize).collect(Collectors.toList());
+
+
+				return new RankingResultVo(result, targetReplySource.size(), minTime, maxTime);
 			} finally {
 				ComparisonDatabase.getInstance().readUnLock();
 				rwLock.readLock().unlock();
