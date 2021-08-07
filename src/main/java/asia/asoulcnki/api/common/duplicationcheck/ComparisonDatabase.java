@@ -168,13 +168,14 @@ public class ComparisonDatabase {
 
 		// update related like sum
 		if (oldReply != null && oldReply.getLikeNum() != reply.getLikeNum()) {
-			if (oldReply.getOriginRpid() >= 0) {
+			if (oldReply.getOriginRpid() >= 0) { // old reply is copied from original reply
 				Reply relatedReply = replyMap.get(oldReply.getOriginRpid());
 				int likeSum = relatedReply.getSimilarLikeSum();
 				likeSum = likeSum - oldReply.getLikeNum() + reply.getLikeNum();
 				relatedReply.setSimilarLikeSum(likeSum);
 			}
 			oldReply.setLikeNum(reply.getLikeNum());
+			return;
 		}
 
 		String content = ArticleCompareUtil.trim(reply.getContent());
