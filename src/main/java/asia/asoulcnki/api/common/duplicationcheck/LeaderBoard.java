@@ -173,9 +173,13 @@ public class LeaderBoard {
 
 				int fromIndex = (pageNum - 1) * pageSize;
 
-				List<Reply> result = targetReplySource.stream().filter(filter). //
+                List<Reply> result;
+                if (filter == null) {
+                    result = targetReplySource;
+                } else {
+                    result = targetReplySource.stream().filter(filter). //
 						skip(fromIndex).limit(pageSize).collect(Collectors.toList());
-
+                }
 
 				return new RankingResultVo(result, targetReplySource.size(), minTime, maxTime);
 			} finally {

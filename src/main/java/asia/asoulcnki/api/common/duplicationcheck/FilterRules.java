@@ -25,15 +25,14 @@ public class FilterRules {
 	}
 
 	public static Predicate<Reply> userIDIn(List<Integer> userIDs) {
+        if (userIDs == null || userIDs.isEmpty()) {
+            return null;
+        }
 		Predicate<Reply> userPredicate = new Predicate<Reply>() {
             @Override
             public boolean test(Reply reply) {
-                if (userIDs == null) {
-                    return true;
-                }
-
                 for (int id : userIDs) {
-                    if (reply.getMid() == id) {
+                    if (reply.getUid() == id) {
                         return true;
                     }
                 }
@@ -43,10 +42,6 @@ public class FilterRules {
             @Override
             public int hashCode() {
                 int hash = 0;
-                if (userIDs == null) {
-                    return hash;
-                }
-
                 for (int id : userIDs) {
                     hash += id;
                 }
