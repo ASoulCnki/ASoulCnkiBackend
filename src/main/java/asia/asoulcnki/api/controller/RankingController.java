@@ -1,6 +1,6 @@
 package asia.asoulcnki.api.controller;
 
-import asia.asoulcnki.api.common.duplicationcheck.FilterRules;
+import asia.asoulcnki.api.common.duplicationcheck.FilterRulesContainer;
 import asia.asoulcnki.api.common.response.ApiResult;
 import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.vo.RankingResultVo;
@@ -28,10 +28,11 @@ public class RankingController {
 
 	@GetMapping("/")
 	@ResponseBody
-	public ApiResult<RankingResultVo> getRankingResult(@RequestParam int sortMode, @RequestParam int timeRangeMode, 
-            @RequestParam(value = "id", required = false) List<Integer> ids, @RequestParam int pageSize, @RequestParam int pageNum) {
-       
-        SortMethodEnum sortMethod = SortMethodEnum.DEFAULT;
+	public ApiResult<RankingResultVo> getRankingResult(@RequestParam int sortMode, @RequestParam int timeRangeMode,
+			@RequestParam(value = "ids", required = false) List<Integer> ids, @RequestParam(value = "keywords",
+			required = false) List<String> keywords, @RequestParam int pageSize, @RequestParam int pageNum) {
+
+		SortMethodEnum sortMethod = SortMethodEnum.DEFAULT;
 		switch (sortMode) {
 		case 1:
 			sortMethod = SortMethodEnum.LIKE_NUM;
@@ -51,9 +52,11 @@ public class RankingController {
 			break;
 		}
 
-        Predicate<Reply> filter = FilterRules.userIDIn(ids);
+		FilterRulesContainer container = new FilterRulesContainer();
+		container.addContainsKeywordsPredicate(keywords);
+		container.addUserIDInFilter(ids);
 
-		return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, filter, pageSize, pageNum));
+		return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, container, pageSize, pageNum));
 	}
 
 }
