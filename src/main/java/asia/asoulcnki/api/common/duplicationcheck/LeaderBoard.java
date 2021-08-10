@@ -31,14 +31,14 @@ public class LeaderBoard {
 	private LeaderBoard() {
 
 		similarLikeSumLeaderboard = new LeaderBoardEntry(Comparator.comparing(Reply::getSimilarLikeSum).reversed());
-		similarLikeSumLeaderboard.setAllRepliesFilter(CommonFilterRules.similarLikeSumGreaterThan(100).and(CommonFilterRules.similarLikeCountGreaterThan(1)));
-		similarLikeSumLeaderboard.setRepliesInOneWeekFilter(CommonFilterRules.similarLikeSumGreaterThan(80).and(CommonFilterRules.similarLikeCountGreaterThan(0)));
-		similarLikeSumLeaderboard.setRepliesInThreeDaysFilter(CommonFilterRules.similarLikeSumGreaterThan(50).and(CommonFilterRules.similarLikeCountGreaterThan(0)));
+		similarLikeSumLeaderboard.setAllRepliesFilter(CommonFilterRules.similarLikeSumGreaterThan(50).and(CommonFilterRules.similarLikeCountGreaterThan(1)));
+		similarLikeSumLeaderboard.setRepliesInOneWeekFilter(CommonFilterRules.similarLikeSumGreaterThan(30).and(CommonFilterRules.similarLikeCountGreaterThan(0)));
+		similarLikeSumLeaderboard.setRepliesInThreeDaysFilter(CommonFilterRules.similarLikeSumGreaterThan(10).and(CommonFilterRules.similarLikeCountGreaterThan(0)));
 
 		likeLeaderBoard = new LeaderBoardEntry(Comparator.comparing(Reply::getLikeNum).reversed());
-		likeLeaderBoard.setAllRepliesFilter(CommonFilterRules.likeNumGreaterThan(300));
-		likeLeaderBoard.setRepliesInOneWeekFilter(CommonFilterRules.likeNumGreaterThan(150));
-		likeLeaderBoard.setRepliesInThreeDaysFilter(CommonFilterRules.likeNumGreaterThan(100));
+		likeLeaderBoard.setAllRepliesFilter(CommonFilterRules.likeNumGreaterThan(100));
+		likeLeaderBoard.setRepliesInOneWeekFilter(CommonFilterRules.likeNumGreaterThan(80));
+		likeLeaderBoard.setRepliesInThreeDaysFilter(CommonFilterRules.likeNumGreaterThan(50));
 
 		similarCountLeaderBoard = new LeaderBoardEntry(Comparator.comparing(Reply::getSimilarCount).reversed());
 		similarCountLeaderBoard.setAllRepliesFilter(CommonFilterRules.similarLikeCountGreaterThan(5));

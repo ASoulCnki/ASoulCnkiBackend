@@ -1,5 +1,7 @@
 package asia.asoulcnki.api.common.duplicationcheck.filters;
 
+import asia.asoulcnki.api.common.BizException;
+import asia.asoulcnki.api.common.response.CnkiCommonEnum;
 import asia.asoulcnki.api.persistence.entity.Reply;
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,6 +17,9 @@ public class KeywordsFilter implements Predicate<Reply> {
 	private final List<String> keywords;
 
 	public KeywordsFilter(final List<String> keywords) {
+		if (!isValidParam(keywords)) {
+			throw new BizException(CnkiCommonEnum.INVALID_REQUEST.getResultCode(), "invalid keyword param");
+		}
 		if (isAllBlank(keywords)) {
 			this.keywords = emptyKeywords;
 			return;
@@ -24,6 +29,13 @@ public class KeywordsFilter implements Predicate<Reply> {
 
 	private static boolean isAllBlank(final List<String> keywords) {
 		return keywords == null || keywords.stream().allMatch(StringUtils::isBlank);
+	}
+
+	private static boolean isValidParam(final List<String> keywords) {
+		if (keywords == null) {
+			return true;
+		}
+		return keywords.size() <= 3 && keywords.stream().allMatch(k -> k.length() <= 10);
 	}
 
 	@Override

@@ -70,7 +70,7 @@ public class IDataServiceImpl implements IDataService {
 		ComparisonDatabase db = ComparisonDatabase.getInstance();
 
 		int pageIndex = 1;
-		int pageSize = 50000;
+		int pageSize = 10000;
 
 
 		int count = 0;
