@@ -1,5 +1,27 @@
 version: '3'
 services:
+  elasticsearch:
+    image: elasticsearch:7.14.0
+    restart: always
+    hostname: es
+    container_name: es7
+    volumes:
+      - ./es/data:/usr/share/elasticsearch/data
+      - ./es/plugins:/usr/share/elasticsearch/plugins
+      - ./es/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - TZ="Asia/Shanghai"
+      - discovery.type=single-node
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    privileged: true
+
   mysql:
     hostname: mysql8
     image: mysql:8
@@ -17,7 +39,26 @@ services:
       - ..:/etc/mysql/bin # 映射数据文件
     ports:
       - "3388:3306"
-
+  logstash:
+    image: logstash:7.14.0
+    hostname: logstash
+    restart: always
+    container_name: logstash7
+    environment:
+      - TZ="Asia/Shanghai"
+    depends_on:
+      - elasticsearch
+      - mysql
+    #    links:
+    #      - es7
+    #      - mysql
+    volumes:
+      - ./logstash/config/jdbc.conf:/usr/share/logstash/config/jdbc.conf   #主配置文件
+      - ./logstash/jar/:/usr/share/logstash/jar/
+      - ./logstash/sql/:/usr/share/logstash/config/sql/
+    ports:
+      - "5044:5044"
+    privileged: true
   redis:
     hostname: redis
     image: redis:5.0.0

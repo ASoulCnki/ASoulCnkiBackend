@@ -49,3 +49,7 @@ secure:
 
 swagger:
   enabled: true
+
+elasticsearch:
+  ip: 0.0.0.0
+  port: 9200
