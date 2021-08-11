@@ -58,3 +58,7 @@ mvn clean package docker:build
 docker run -e PROFILES=demo -d -v host-path-to-data-dir:/opt/data registry.cn-hangzhou.aliyuncs.com/asoulcnki/api:latest
  # 启动docker
 ```
+
+## API文档
+
+参见[API文档](./api.md)
