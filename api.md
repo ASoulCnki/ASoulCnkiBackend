@@ -71,34 +71,34 @@ Content-Type: application/json
 
 ```json
 {
-	"code": 0,
-	"message": "success",
-	"data": {
-		"rate": 1,
-		"start_time": 1606137506,
-		"end_time": 1628654399,
-		"related": [
-			{
-				"rate": 1,
-				"reply": {
-					"rpid": "5004265317",
-					"type_id": 17,
-					"dynamic_id": "552086903093256371",
-					"mid": 5421504,
-					"uid": 672328094,
-					"oid": "552086903093256371",
-					"ctime": 1627381220,
-					"m_name": "恰柠檬儿丶",
-					"content": "11111111111 0 \n1111111111111 0 111 0\n1111111111111111111",
-					"like_num": 166,
-					"origin_rpid": "-1",
-					"similar_count": 0,
-					"similar_like_sum": 166
-				},
-				"reply_url": " https://t.bilibili.com/552086903093256371/#reply5004265317"
-			}
-		]
-	}
+  "code": 0,
+  "message": "success",
+  "data": {
+    "rate": 1,
+    "start_time": 1606137506,
+    "end_time": 1628654399,
+    "related": [
+      {
+        "rate": 1,
+        "reply": {
+          "rpid": "5004265317",
+          "type_id": 17,
+          "dynamic_id": "552086903093256371",
+          "mid": 5421504,
+          "uid": 672328094,
+          "oid": "552086903093256371",
+          "ctime": 1627381220,
+          "m_name": "恰柠檬儿丶",
+          "content": "11111111111 0 \n1111111111111 0 111 0\n1111111111111111111",
+          "like_num": 166,
+          "origin_rpid": "-1",
+          "similar_count": 0,
+          "similar_like_sum": 166
+        },
+        "reply_url": " https://t.bilibili.com/552086903093256371/#reply5004265317"
+      }
+    ]
+  }
 }
 ```
 
