@@ -174,6 +174,8 @@ public class ComparisonDatabase {
 					int likeSum = relatedReply.getSimilarLikeSum();
 					likeSum = likeSum - oldReply.getLikeNum() + reply.getLikeNum();
 					relatedReply.setSimilarLikeSum(likeSum);
+				} else {
+					oldReply.setSimilarLikeSum(oldReply.getSimilarLikeSum() - oldReply.getLikeNum() + reply.getLikeNum());
 				}
 				oldReply.setLikeNum(reply.getLikeNum());
 			}
