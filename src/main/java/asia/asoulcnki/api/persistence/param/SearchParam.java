@@ -10,7 +10,7 @@ public class SearchParam {
     @NotEmpty
     private String q;
 
-    private Integer size;
+    private Integer size = 10;
 
-    private Integer from;
+    private Integer from = 0;
 }
