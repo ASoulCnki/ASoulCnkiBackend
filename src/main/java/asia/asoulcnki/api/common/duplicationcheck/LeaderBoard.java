@@ -171,7 +171,7 @@ public class LeaderBoard {
 			ComparisonDatabase.getInstance().readLock();
 			rwLock.readLock().lock();
 			try {
-				if (pageSize != 10 || pageNum < 1) {
+				if (pageSize == 0 || pageNum < 1) {
 					return new RankingResultVo();
 				}
 
