@@ -3,13 +3,13 @@ package asia.asoulcnki.api.service.impl;
 import asia.asoulcnki.api.common.BizException;
 import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
 import asia.asoulcnki.api.common.response.CnkiCommonEnum;
+import asia.asoulcnki.api.common.util.ObjectMapperFactory;
 import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.vo.ControlResultVo;
 import asia.asoulcnki.api.service.IDataService;
 import asia.asoulcnki.api.service.IRankingService;
 import asia.asoulcnki.api.service.IReplyService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -34,12 +34,12 @@ public class IDataServiceImpl implements IDataService {
 	@Autowired
 	IRankingService rankingService;
 
+	private static final ObjectMapper objectMapper = ObjectMapperFactory.getInstance();
+
 	public static List<Reply> getJsonFile(String path) {
-		ObjectMapper objMapper = new ObjectMapper();
-		objMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		try {
-			JavaType javaType = objMapper.getTypeFactory().constructCollectionType(List.class, Reply.class);
-			return objMapper.readValue(new File(path), javaType);
+			JavaType javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, Reply.class);
+			return objectMapper.readValue(new File(path), javaType);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
