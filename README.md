@@ -16,12 +16,12 @@
 
 #### 2.1 依赖json文件运行
 
-#### 2.1.1 （方法一）快速开始
+##### 2.1.1 （方法一）快速开始
 1. 将 [bilibili_cnki_reply.json](https://drive.google.com/file/d/151oz560vj2T2uwxYrRbxq1NPYwvx_dNf/view?usp=sharing) 放入项目根目录下的 data 文件夹
 2. 运行 src/test/asia/asoulcnki.api/StartTrainTest.testStartTrain 开始训练
 3. 训练完毕后，运行 ApiApplication 启动服务，即可正常使用
 
-#### 2.1.2 （方法二）使用其他语言调接口训练
+##### 2.1.2 （方法二）使用其他语言调接口训练
 1. 修改application-demo.yml中的secure.key
 2. 将bilibili_cnki_reply.json([样本](https://drive.google.com/file/d/151oz560vj2T2uwxYrRbxq1NPYwvx_dNf/view?usp=sharing))放入data文件夹
 3. 运行springboot后端
