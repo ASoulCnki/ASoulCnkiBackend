@@ -159,6 +159,13 @@
             <version>7.14.0</version>
         </dependency>
 
+        <!--单测框架-->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.0.0</version>
+        </dependency>
+
     </dependencies>
 
 
