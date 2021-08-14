@@ -16,11 +16,17 @@
 
 #### 2.1 依赖json文件运行
 
+##### 2.1.1 （方法一）快速开始
+1. 将 [bilibili_cnki_reply.json](https://drive.google.com/file/d/151oz560vj2T2uwxYrRbxq1NPYwvx_dNf/view?usp=sharing) 放入项目根目录下的 data 文件夹
+2. 运行 src/test/asia/asoulcnki.api/StartTrainTest.testStartTrain 开始训练
+3. 训练完毕后，运行 ApiApplication 启动服务，即可正常使用
+
+##### 2.1.2 （方法二）使用其他语言调接口训练
 1. 修改application-demo.yml中的secure.key
 2. 将bilibili_cnki_reply.json([样本](https://drive.google.com/file/d/151oz560vj2T2uwxYrRbxq1NPYwvx_dNf/view?usp=sharing))放入data文件夹
 3. 运行springboot后端
 4. 调用后端train接口训练数据 训练需要较长时间(约一分钟)  
-   示例请求(python):
+   [示例请求](./dev/start_train.py)(python):
 
 ```python
 import requests
@@ -55,8 +61,8 @@ mvn clean package docker:build
 # 或者
 # docker pull registry.cn-hangzhou.aliyuncs.com/asoulcnki/api:latest
 
-docker run -e PROFILES=demo -d -v host-path-to-data-dir:/opt/data registry.cn-hangzhou.aliyuncs.com/asoulcnki/api:latest
- # 启动docker
+docker run -e PROFILES=demo -p 8000:8000 -d -v host-path-to-data-dir:/opt/data registry.cn-hangzhou.aliyuncs.com/asoulcnki/api:latest
+ # 暴露本机 8000 端口，启动docker
 ```
 
 ## API文档
