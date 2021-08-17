@@ -14,7 +14,6 @@ public class IUserSpeechHistoryServiceImpl implements IUserSpeechHistoryService 
     @Override
     public UserSpeechHistoryVO getHistory(Integer mid) {
         ComparisonDatabase db = ComparisonDatabase.getInstance();
-        System.err.println(db.getReply(3738762433L));
         return db.getHistory(mid);
     }
 }
