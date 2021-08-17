@@ -7,6 +7,8 @@ on:
 jobs:
         build:
                 runs-on: ubuntu-latest
+                env:
+                  GHA_BUILD_ENV: true
                 steps:
                         - uses: actions/checkout@v2
                         - name: Cache dependencies
@@ -21,7 +23,7 @@ jobs:
                           with:
                                   java-version: '8'
                                   distribution: 'adopt'
-                         
+
                         - name: Install dependencies
                           run: mvn clean install
 
