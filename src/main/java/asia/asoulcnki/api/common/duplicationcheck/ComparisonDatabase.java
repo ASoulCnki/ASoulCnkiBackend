@@ -1,6 +1,8 @@
 package asia.asoulcnki.api.common.duplicationcheck;
 
 import asia.asoulcnki.api.persistence.entity.Reply;
+import asia.asoulcnki.api.persistence.entity.UserSpeechHistoryList;
+import asia.asoulcnki.api.persistence.vo.UserSpeechHistoryVO;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -35,12 +37,15 @@ public class ComparisonDatabase {
 	//  text hash -> reply ids
 	private Map<Long, ArrayList<Long>> textHashMap;
 
+	private UserSpeechHistoryList historyList;
+
 	private ComparisonDatabase() {
 		this.minTime = Integer.MAX_VALUE;
 		this.maxTime = 0;
 		this.rwLock = new ReentrantReadWriteLock();
 		this.replyMap = new HashMap<>(initialCapacity);
 		this.textHashMap = new HashMap<>(initialCapacity);
+		this.historyList = new UserSpeechHistoryList();
 	}
 
 	public static synchronized ComparisonDatabase getInstance() {
@@ -81,6 +86,7 @@ public class ComparisonDatabase {
 		log.info("after alloc buffer");
 		printMemory();
 		ComparisonDatabase db = kryo.readObject(input, ComparisonDatabase.class);
+		System.err.println(db.replyMap.size());
 		log.info("after de-serialize");
 		printMemory();
 		input.close();
@@ -142,6 +148,7 @@ public class ComparisonDatabase {
 		}
 		Kryo kryo = new Kryo();
 		File file = new File(dataDir + "/" + imageName);
+		System.err.println(this.historyList.getHistories().size());
 		Output output = new Output(new FileOutputStream(file));
 		kryo.writeObject(output, this);
 		output.close();
@@ -162,6 +169,9 @@ public class ComparisonDatabase {
 	public void addReplyData(Reply reply) {
 		if (reply == null) {
 			return;
+		}
+		if (System.getProperty("history.enable") != null) {
+			this.historyList.add(reply);
 		}
 
 		Reply oldReply = replyMap.get(reply.getRpid());
@@ -199,6 +209,7 @@ public class ComparisonDatabase {
 
 		// add reply to map and update stats
 		this.replyMap.put(reply.getRpid(), reply);
+
 		if (reply.getCtime() > this.maxTime) {
 			this.maxTime = reply.getCtime();
 		}
@@ -275,4 +286,7 @@ public class ComparisonDatabase {
 		return maxTime;
 	}
 
+	public UserSpeechHistoryVO getHistory(Integer mid) {
+		return this.historyList.get(mid);
+	}
 }
