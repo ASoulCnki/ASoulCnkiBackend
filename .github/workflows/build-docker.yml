@@ -36,8 +36,6 @@ jobs:
                                   username: ${{ secrets.ALI_USERNAME }}
                                   password: ${{ secrets.ALI_PASSWORD }}
                                   registry: registry.cn-hangzhou.aliyuncs.com
-                                  repository: registry.cn-hangzhou.aliyuncs.com/asoulcnki/api
-                                  auto_tag: true
                        
                         - name: Publish to docker registry
                           run: docker push registry.cn-hangzhou.aliyuncs.com/asoulcnki/api
