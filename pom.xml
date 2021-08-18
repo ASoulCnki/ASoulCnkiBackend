@@ -166,6 +166,12 @@
             <version>7.0.0</version>
         </dependency>
 
+	<!--阿里巴巴规约插件-->
+	<dependency>
+		<groupId>com.alibaba.p3c</groupId>
+		<artifactId>p3c-pmd</artifactId>
+		<version>1.3.6</version>
+	</dependency>
     </dependencies>
 
 
