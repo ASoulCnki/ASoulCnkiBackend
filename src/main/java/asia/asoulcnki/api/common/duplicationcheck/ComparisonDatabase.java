@@ -229,10 +229,6 @@ public class ComparisonDatabase {
 			}
 			textHashMap.get(textHash).add(reply.getRpid());
 		}
-
-		if (replyMap.size() % 20000 == 0) {
-			log.info("reply size: {}", replyMap.size());
-		}
 	}
 
 	private boolean isChess(String content) {
