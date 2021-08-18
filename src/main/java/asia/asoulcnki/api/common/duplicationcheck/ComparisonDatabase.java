@@ -58,6 +58,8 @@ public class ComparisonDatabase {
 						instance = loadFromImage(DEFAULT_DATA_DIR + "/" + DEFAULT_IMAGE_FILE_NAME);
 						log.info("load database cost {} ms", System.currentTimeMillis() - start);
 					} catch (Exception e) {
+						log.error(e.getMessage(), e);
+						log.warn("loading comparison database failed, use empty database.");
 						instance = new ComparisonDatabase();
 					}
 					instance.rwLock = new ReentrantReadWriteLock();
