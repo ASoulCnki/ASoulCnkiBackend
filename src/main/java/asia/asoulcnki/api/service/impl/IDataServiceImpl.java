@@ -147,8 +147,12 @@ public class IDataServiceImpl implements IDataService {
 				throw new BizException(CnkiCommonEnum.INTERNAL_SERVER_ERROR);
 			}
 			ComparisonDatabase db = ComparisonDatabase.getInstance();
-			for (Reply reply : node) {
-				db.addReplyData(reply);
+			for (int i = 0; i < node.size(); i++) {
+				if (i % 10000 == 0) {
+					float percent = (float) i / node.size() * 100;
+					log.info(String.format("train process: %.2f%% detail: %d/%d", percent, i, node.size()));
+				}
+				db.addReplyData(node.get(i));
 			}
 			log.info("train end cost {} ms", System.currentTimeMillis() - start);
 		} catch (Exception e) {
