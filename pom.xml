@@ -109,7 +109,7 @@
         <dependency>
             <artifactId>fastjson</artifactId>
             <groupId>com.alibaba</groupId>
-            <version>1.2.41</version>
+            <version>1.2.76</version>
         </dependency>
 
         <!-- 处理配置 -->
