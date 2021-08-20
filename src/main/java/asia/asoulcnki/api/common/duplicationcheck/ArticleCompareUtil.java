@@ -22,6 +22,8 @@ public class ArticleCompareUtil {
 	public static String trim(String s) {
 		String stopWord = "[\\pP\\p{Punct}]";
 		s = s.replaceAll("\\s*", "");
+		s = s.replaceAll("\\p{Cf}","");  //去除控制字符
+		s = s.replaceAll("/[\\u200b-\\u200f\\ufeff\\u202a-\\u202e]/g","");  //去除零宽空格等
 		s = s.replaceAll(stopWord, "");
 		return s;
 	}
