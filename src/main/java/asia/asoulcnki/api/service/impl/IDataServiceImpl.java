@@ -5,6 +5,7 @@ import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
 import asia.asoulcnki.api.common.response.CnkiCommonEnum;
 import asia.asoulcnki.api.common.util.ObjectMapperFactory;
 import asia.asoulcnki.api.persistence.entity.Reply;
+import asia.asoulcnki.api.persistence.entity.UserSpeechHistoryList;
 import asia.asoulcnki.api.persistence.vo.ControlResultVo;
 import asia.asoulcnki.api.service.IDataService;
 import asia.asoulcnki.api.service.IRankingService;
@@ -91,7 +92,7 @@ public class IDataServiceImpl implements IDataService {
 			// add to comparison database
 			db.writeLock();
 			try {
-				replies.forEach(db::addReplyData);
+				addRepliesToDatabase(replies);
 			} finally {
 				db.writeUnLock();
 			}
@@ -105,6 +106,16 @@ public class IDataServiceImpl implements IDataService {
 		log.info("pull data cost {} ms, add {} records to comparison database in total",
 				pullDataEnd - queryStartRpidEnd, count);
 		return checkpoint();
+	}
+
+	private void addRepliesToDatabase(List<Reply> replies) {
+		boolean addToHistoryDatabase = System.getProperty("history.enable") != null;
+		for (Reply reply : replies) {
+			ComparisonDatabase.getInstance().addReplyData(reply);
+			if (addToHistoryDatabase) {
+				UserSpeechHistoryList.getInstance().add(reply);
+			}
+		}
 	}
 
 	@Override

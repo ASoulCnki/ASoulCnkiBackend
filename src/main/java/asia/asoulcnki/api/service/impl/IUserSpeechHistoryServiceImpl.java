@@ -1,6 +1,6 @@
 package asia.asoulcnki.api.service.impl;
 
-import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
+import asia.asoulcnki.api.persistence.entity.UserSpeechHistoryList;
 import asia.asoulcnki.api.persistence.vo.UserSpeechHistoryVO;
 import asia.asoulcnki.api.service.IUserSpeechHistoryService;
 import org.slf4j.Logger;
@@ -13,7 +13,7 @@ public class IUserSpeechHistoryServiceImpl implements IUserSpeechHistoryService 
 
     @Override
     public UserSpeechHistoryVO getHistory(Integer mid) {
-        ComparisonDatabase db = ComparisonDatabase.getInstance();
-        return db.getHistory(mid);
+        UserSpeechHistoryList db = UserSpeechHistoryList.getInstance();
+        return db.get(mid);
     }
 }
