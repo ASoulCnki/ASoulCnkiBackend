@@ -46,7 +46,7 @@ public class IDataServiceImpl implements IDataService {
 		}
 	}
 
-	@Cacheable(key = "#startTime", value = "defaultCache")
+	@Cacheable(value = "defaultCache")
 	public long getStartRpid(int startTime) {
 		QueryWrapper<Reply> queryWrapper = new QueryWrapper<>();
 		queryWrapper.gt("ctime", startTime).select("min(rpid) as min_rpid");
