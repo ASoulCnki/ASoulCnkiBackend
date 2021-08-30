@@ -22,8 +22,10 @@ public class ArticleCompareUtil {
 	public static String trim(String s) {
 		String stopWord = "[\\pP\\p{Punct}]";
 		s = s.replaceAll("\\s*", "");
-		s = s.replaceAll("\\p{Cf}","");  //去除控制字符
-		s = s.replaceAll("/[\\u200b-\\u200f\\ufeff\\u202a-\\u202e]/g","");  //去除零宽空格等
+        //去除控制字符
+		s = s.replaceAll("\\p{Cf}","");
+        //去除零宽空格等
+		s = s.replaceAll("/[\\u200b-\\u200f\\ufeff\\u202a-\\u202e]/g","");
 		s = s.replaceAll(stopWord, "");
 		return s;
 	}
@@ -75,10 +77,5 @@ public class ArticleCompareUtil {
 			return 0;
 		}
 		return s.codePointCount(0, s.length());
-	}
-
-	public static void main(String[] args) {
-		String s = "7月9日，认识了一个男人，他跟我聊叔本华，聊弗洛伊，聊庄子妻死，聊伽罗瓦和近世代数，聊彭罗斯和宇宙督察假说\n" + "\n" + "7月10日，我让他b站关注嘉然今天吃什么";
-		System.out.println(textLength(trim(s)));
 	}
 }
