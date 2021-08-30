@@ -106,7 +106,7 @@ Content-Type: application/json
 
 请求类型：GET
 
-请求地址：/v1/api/check
+请求地址：/v1/api/ranking
 
 ### 请求参数
 
