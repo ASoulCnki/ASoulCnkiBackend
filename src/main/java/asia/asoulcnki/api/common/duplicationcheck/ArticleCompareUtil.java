@@ -46,6 +46,12 @@ public class ArticleCompareUtil {
         return s;
     }
 
+    /**
+     * 使用滑动窗口将字符串分段，以便 compareArticle 方法比较
+     *
+     * @param s 小作文
+     * @return
+     */
     static List<String> getStringSegs(String s) {
         int codePointCount = s.codePointCount(0, s.length());
         if (codePointCount <= SummaryHash.DEFAULT_K) {
