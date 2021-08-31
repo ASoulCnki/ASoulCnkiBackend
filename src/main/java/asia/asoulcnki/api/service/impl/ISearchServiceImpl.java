@@ -21,7 +21,7 @@ import java.util.Map;
 
 @Service
 public class ISearchServiceImpl implements ISearchService {
-    private static final Logger logger = LoggerFactory.getLogger(ISearchServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ISearchServiceImpl.class);
 
     private static final String DEFAULT_INDEX = "as";
 
