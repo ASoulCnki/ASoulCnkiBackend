@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ObjectMapperFactory {
     private static ObjectMapper INSTANCE;
 
-    // 私有构造方法，防止错误 new
+    /**
+     * 私有构造方法，防止错误 new
+     */
     private ObjectMapperFactory() {
     }
 

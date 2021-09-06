@@ -23,40 +23,45 @@ import java.util.function.Predicate;
 @Validated
 public class RankingController {
 
-	@Autowired
-	IRankingService rankingService;
+    @Autowired
+    IRankingService rankingService;
 
-	@GetMapping("/")
-	@ResponseBody
-	public ApiResult<RankingResultVo> getRankingResult(@RequestParam int sortMode, @RequestParam int timeRangeMode,
-			@RequestParam(value = "ids", required = false) List<Integer> ids, @RequestParam(value = "keywords",
-			required = false) List<String> keywords, @RequestParam int pageSize, @RequestParam int pageNum) {
+    @GetMapping("/")
+    @ResponseBody
+    public ApiResult<RankingResultVo> getRankingResult(@RequestParam int sortMode, @RequestParam int timeRangeMode,
+                                                       @RequestParam(value = "ids", required = false) List<Integer> ids, @RequestParam(value = "keywords",
+        required = false) List<String> keywords, @RequestParam int pageSize, @RequestParam int pageNum) {
+        // 选择排序方式和时间筛选范围
+        SortMethodEnum sortMethod;
+        switch (sortMode) {
+            case 1:
+                sortMethod = SortMethodEnum.LIKE_NUM;
+                break;
+            case 2:
+                sortMethod = SortMethodEnum.SIMILAR_COUNT;
+                break;
+            default:
+                sortMethod = SortMethodEnum.DEFAULT;
+        }
 
-		SortMethodEnum sortMethod = SortMethodEnum.DEFAULT;
-		switch (sortMode) {
-		case 1:
-			sortMethod = SortMethodEnum.LIKE_NUM;
-			break;
-		case 2:
-			sortMethod = SortMethodEnum.SIMILAR_COUNT;
-			break;
-		}
+        TimeRangeEnum timeRange;
+        switch (timeRangeMode) {
+            case 1:
+                timeRange = TimeRangeEnum.ONE_WEEK;
+                break;
+            case 2:
+                timeRange = TimeRangeEnum.THREE_DAYS;
+                break;
+            default:
+                timeRange = TimeRangeEnum.ALL;
+        }
 
-		TimeRangeEnum timeRange = TimeRangeEnum.ALL;
-		switch (timeRangeMode) {
-		case 1:
-			timeRange = TimeRangeEnum.ONE_WEEK;
-			break;
-		case 2:
-			timeRange = TimeRangeEnum.THREE_DAYS;
-			break;
-		}
+        // 筛选关键词
+        FilterRulesContainer container = new FilterRulesContainer();
+        container.addContainsKeywordsPredicate(keywords);
+        container.addUserIDInFilter(ids);
 
-		FilterRulesContainer container = new FilterRulesContainer();
-		container.addContainsKeywordsPredicate(keywords);
-		container.addUserIDInFilter(ids);
-
-		return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, container, pageSize, pageNum));
-	}
+        return ApiResult.ok(rankingService.queryRankings(sortMethod, timeRange, container, pageSize, pageNum));
+    }
 
 }

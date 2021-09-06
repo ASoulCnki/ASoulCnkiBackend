@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @Api(tags = "搜索相关")
 @Validated
-//@Conditional(ConditionalPush.class)
 public class SearchController {
 
     @Autowired

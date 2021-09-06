@@ -14,29 +14,29 @@ import org.springframework.stereotype.Service;
 @CacheConfig(cacheNames = "checkCache")
 public class IRankingServiceImpl implements IRankingService {
 
-	@Override
-	@Cacheable(value = "leaderboard")
-	public RankingResultVo queryRankings(final SortMethodEnum sortMethod, final TimeRangeEnum timeRange,
-			final FilterRulesContainer container, final int pageSize, final int pageNum) {
-		LeaderBoardEntry leaderBoard;
+    @Override
+    @Cacheable(value = "leaderboard")
+    public RankingResultVo queryRankings(final SortMethodEnum sortMethod, final TimeRangeEnum timeRange,
+                                         final FilterRulesContainer container, final int pageSize, final int pageNum) {
+        LeaderBoardEntry leaderBoard;
 
-		switch (sortMethod) {
-		case SIMILAR_COUNT:
-			leaderBoard = LeaderBoard.getInstance().getSimilarCountLeaderBoard();
-			break;
-		case LIKE_NUM:
-			leaderBoard = LeaderBoard.getInstance().getLikeLeaderBoard();
-			break;
-		default:
-			leaderBoard = LeaderBoard.getInstance().getSimilarLikeSumLeaderboard();
-		}
+        switch (sortMethod) {
+            case SIMILAR_COUNT:
+                leaderBoard = LeaderBoard.getInstance().getSimilarCountLeaderBoard();
+                break;
+            case LIKE_NUM:
+                leaderBoard = LeaderBoard.getInstance().getLikeLeaderBoard();
+                break;
+            default:
+                leaderBoard = LeaderBoard.getInstance().getSimilarLikeSumLeaderboard();
+        }
 
-		return leaderBoard.query(container.getFilter(), timeRange, pageSize, pageNum);
-	}
+        return leaderBoard.query(container.getFilter(), timeRange, pageSize, pageNum);
+    }
 
-	@Override
-	@CacheEvict(value = "leaderboard", allEntries = true)
-	public void refresh() {
-		LeaderBoard.getInstance().refresh();
-	}
+    @Override
+    @CacheEvict(value = "leaderboard", allEntries = true)
+    public void refresh() {
+        LeaderBoard.getInstance().refresh();
+    }
 }
