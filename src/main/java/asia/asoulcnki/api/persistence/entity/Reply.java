@@ -15,52 +15,94 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @ToString
 public class Reply implements Serializable {
-	private static final long serialVersionUID = 6554064566476229771L;
+    private static final long serialVersionUID = 6554064566476229771L;
 
-	@TableId(value = "rpid")
-	@JsonProperty("rpid")
-	@JsonSerialize(using = ToStringSerializer.class)
-	private Long rpid;
+    /**
+     * 评论 id
+     */
+    @TableId(value = "rpid")
+    @JsonProperty("rpid")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long rpid;
 
-	@JsonProperty("type_id")
-	private int typeId;
+    /**
+     * 动态类型 id
+     * 1:      视频
+     * 11/17:  文字动态
+     * 12:     专栏
+     */
+    @JsonProperty("type_id")
+    private int typeId;
 
-	@JsonProperty("dynamic_id")
-	@JsonSerialize(using = ToStringSerializer.class)
-	private long dynamicId;
+    /**
+     * 动态 id
+     */
+    @JsonProperty("dynamic_id")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private long dynamicId;
 
-	@JsonProperty("mid")
-	private int mid;
+    /**
+     * 发布评论者 id
+     */
+    @JsonProperty("mid")
+    private int mid;
 
+    /**
+     * 动态发布者 id
+     */
     @JsonProperty("uid")
     private int uid;
 
-	@JsonProperty("oid")
-	@JsonSerialize(using = ToStringSerializer.class)
-	private long oid;
+    /**
+     * 视频原稿件 id
+     */
+    @JsonProperty("oid")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private long oid;
 
-	@JsonProperty("ctime")
-	private int ctime;
+    /**
+     * 评论创建时间
+     */
+    @JsonProperty("ctime")
+    private int ctime;
 
-	@JsonProperty("m_name")
-	private String mName;
+    /**
+     * 评论者昵称
+     */
+    @JsonProperty("m_name")
+    private String mName;
 
-	@JsonProperty("content")
-	private String content;
+    /**
+     * 评论内容
+     */
+    @JsonProperty("content")
+    private String content;
 
-	@JsonProperty("like_num")
-	private int likeNum;
+    /**
+     * 评论点赞数
+     */
+    @JsonProperty("like_num")
+    private int likeNum;
 
-	@JsonProperty("origin_rpid")
-	@TableField(exist = false)
-	@JsonSerialize(using = ToStringSerializer.class)
-	private Long originRpid = -1L;
+    /**
+     * 原创评论 id
+     */
+    @JsonProperty("origin_rpid")
+    @TableField(exist = false)
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long originRpid = -1L;
 
-	@TableField(exist = false)
-	@JsonProperty("similar_count")
-	private Integer similarCount = 0;
+    /**
+     * 相似评论数
+     */
+    @TableField(exist = false)
+    @JsonProperty("similar_count")
+    private Integer similarCount = 0;
 
-	@TableField(exist = false)
-	@JsonProperty("similar_like_sum")
-	private Integer similarLikeSum = 0;
+    /**
+     * 累积点赞数
+     */
+    @TableField(exist = false)
+    @JsonProperty("similar_like_sum")
+    private Integer similarLikeSum = 0;
 }

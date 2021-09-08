@@ -1,6 +1,5 @@
 package asia.asoulcnki.api.persistence.entity;
 
-import asia.asoulcnki.api.common.duplicationcheck.ComparisonDatabase;
 import asia.asoulcnki.api.persistence.vo.UserSpeechHistoryVO;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -11,11 +10,7 @@ import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 
 @Data
@@ -29,7 +24,7 @@ public class UserSpeechHistoryList implements Serializable {
     private volatile static UserSpeechHistoryList instance;
     private final static Logger log = LoggerFactory.getLogger(UserSpeechHistoryList.class);
 
-    public UserSpeechHistoryList() {
+    private UserSpeechHistoryList() {
         this.histories = new ArrayList<>();
     }
 
@@ -64,6 +59,12 @@ public class UserSpeechHistoryList implements Serializable {
         }
     }
 
+    /**
+     * 二分查找获取根据 mid 获取其在 UserSpeechHistory 列表中的下标
+     *
+     * @param id int
+     * @return 下标
+     */
     public int getIndex(int id) {
         int max = histories.size();
         int min = 0;
@@ -90,7 +91,7 @@ public class UserSpeechHistoryList implements Serializable {
         while (min <= max) {
             if (histories.get(half).mid.equals(id)) {
                 vo.setMid(histories.get(half).getMid());
-                vo.setItems(histories.get(half).getItems());
+                vo.setReplies(histories.get(half).getItems());
                 return vo;
             } else if (histories.get(half).mid < id) {
                 min = half + 1;
@@ -126,7 +127,6 @@ public class UserSpeechHistoryList implements Serializable {
     }
 
 
-
     @Data
     @ToString
     static class UserSpeechHistory implements Serializable {
@@ -142,7 +142,7 @@ public class UserSpeechHistoryList implements Serializable {
         }
 
         public void add(Reply reply) {
-            if (items.stream().filter(f -> f.getCtime() == reply.getCtime()).count() <= 0) {
+            if (items.stream().noneMatch(f -> f.getCtime() == reply.getCtime())) {
                 items.add(reply);
                 items.sort(Comparator.comparing(Reply::getCtime));
             }
@@ -150,8 +150,12 @@ public class UserSpeechHistoryList implements Serializable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             UserSpeechHistory that = (UserSpeechHistory) o;
             return Objects.equals(mid, that.mid) && Objects.equals(items, that.items);
         }
