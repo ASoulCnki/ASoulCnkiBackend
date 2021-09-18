@@ -10,5 +10,5 @@ import java.util.List;
 public class UserSpeechHistoryVO implements Serializable {
     private Integer mid;
 
-    private List<Reply> items;
+    private List<Reply> replies;
 }

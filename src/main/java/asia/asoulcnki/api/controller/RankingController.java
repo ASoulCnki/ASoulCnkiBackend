@@ -2,7 +2,6 @@ package asia.asoulcnki.api.controller;
 
 import asia.asoulcnki.api.common.duplicationcheck.FilterRulesContainer;
 import asia.asoulcnki.api.common.response.ApiResult;
-import asia.asoulcnki.api.persistence.entity.Reply;
 import asia.asoulcnki.api.persistence.vo.RankingResultVo;
 import asia.asoulcnki.api.service.IRankingService;
 import asia.asoulcnki.api.service.IRankingService.SortMethodEnum;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @RestController
 @RequestMapping("/ranking")

@@ -1,13 +1,11 @@
 package asia.asoulcnki.api.controller;
 
-import asia.asoulcnki.api.common.config.ConditionalPush;
 import asia.asoulcnki.api.common.response.ApiResult;
 import asia.asoulcnki.api.persistence.param.SearchParam;
 import asia.asoulcnki.api.persistence.vo.SearchResultVO;
 import asia.asoulcnki.api.service.ISearchService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
