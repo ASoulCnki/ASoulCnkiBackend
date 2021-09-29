@@ -21,13 +21,25 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 public class ComparisonDatabase {
+    /**
+     * 数据库存储文件夹
+     */
 	public static final String DEFAULT_DATA_DIR = "data";
+    /**
+     * 数据库文件名
+     */
 	public static final String DEFAULT_IMAGE_FILE_NAME = "database.dat";
 	private final static Logger log = LoggerFactory.getLogger(ComparisonDatabase.class);
 	private final static int initialCapacity = 100 * 10000;
 	private volatile static ComparisonDatabase instance;
+    /**
+     * 数据库读写锁
+     */
 	private transient ReadWriteLock rwLock;
 
+    /**
+     * 数据库内小作文起始和终止时间
+     */
 	private int minTime;
 	private int maxTime;
 	// reply id -> reply
@@ -74,6 +86,12 @@ public class ComparisonDatabase {
 		return String.format("%d (%.2f M)", s, (double) s / (1024 * 1024));
 	}
 
+    /**
+     * 从本地文件中读取数据库到内存
+     * @param path 数据库文件路径
+     * @return 数据库实例
+     * @throws IOException IO错误
+     */
 	private static ComparisonDatabase loadFromImage(String path) throws IOException {
 		Kryo kryo = new Kryo();
 		File file = new File(path);
@@ -90,7 +108,12 @@ public class ComparisonDatabase {
 		return db;
 	}
 
-	// return: key-> rpid, value -> hit count
+    /**
+     * 从数据库中检索相似小作文
+     * @param textHashList 源小作文的hash序列
+     * @param minHit 最少命中hash次数(即两篇小作文需具有超过minHit个相同的hash才会入选)
+     * @return key-> rpid, value -> hit count
+     */
 	public static List<Map.Entry<Long, Integer>> searchRelatedReplies(List<Long> textHashList, int minHit) {
 		float threshold = (float) (textHashList.size() * 0.2);
 		if (threshold <= minHit) {
@@ -99,6 +122,12 @@ public class ComparisonDatabase {
 		return searchRelatedReplies(textHashList, threshold);
 	}
 
+    /**
+     * 从数据库中检索相似小作文
+     * @param textHashList 源小作文的hash序列
+     * @param threshold 两篇小作文相同hash/源小作文最小值
+     * @return key-> rpid, value -> hit count
+     */
 	public static List<Map.Entry<Long, Integer>> searchRelatedReplies(List<Long> textHashList, float threshold) {
 		Map<Long, Integer> replyHitMap = new HashMap<>();
 		for (Long textHash : textHashList) {
@@ -222,12 +251,24 @@ public class ComparisonDatabase {
 		}
 	}
 
+    /**
+     * 判断小作文是否是下棋型
+     * @param content 小作文内容
+     * @return 小作文是否是下棋型
+     */
 	private boolean isChess(String content) {
 		// we don't process chess 😈
 		return content.contains("┼┼┼┼┼┼┼┼") || content.contains("┏┯┯┯┯┯┯┯┯┯┓") || content.contains(
 				"┏┯┯┯┯┯┯┯┯┯┯┯┯┯┯┯┯┓");
 	}
 
+    /**
+     * 计算小作文被引用次数
+     * @param reply reply对象
+     * @param content 小作文内容
+     * @param textHashList 小作文hash序列
+     * 将被引用次数存入传入的reply对象中
+     */
 	private void calculateIf(Reply reply, String content, List<Long> textHashList) {
 		// key-> rpid, value -> hit count
 		List<Map.Entry<Long, Integer>> sortedRelatedReplies = searchRelatedReplies(textHashList, 2);
