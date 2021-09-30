@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class LeaderBoard {
 
-    private final static Logger log = LoggerFactory.getLogger(LeaderBoard.class);
+    private static final Logger log = LoggerFactory.getLogger(LeaderBoard.class);
 
     private static volatile LeaderBoard instance;
     /**
@@ -33,7 +33,7 @@ public class LeaderBoard {
     /**
      * 单页最大元素数
      */
-    private final static int MAX_PAGE_SIZE = 20;
+    private static final int MAX_PAGE_SIZE = 20;
 
     private LeaderBoard() {
         /*
@@ -91,11 +91,11 @@ public class LeaderBoard {
      * @param pageSize 单页大小
      * @param pageNum  页数
      * @param <T>      列表泛型类型
-     * @return
+     * @return 指定单页大小和页数的小作文列表
      */
     public static <T> List<T> page(List<T> list, Integer pageSize, Integer pageNum) {
         if (list == null || list.isEmpty() || pageSize <= 0) {
-            return null;
+            return Collections.emptyList();
         }
 
         if (pageSize > MAX_PAGE_SIZE) {
@@ -172,6 +172,7 @@ public class LeaderBoard {
         void refresh() {
             ComparisonDatabase.getInstance().readLock();
             rwLock.writeLock().lock();
+            log.info("start refreshing");
             try {
                 // 刷新全部
                 allReplies = ComparisonDatabase.getInstance().getReplyMap().values().stream(). //
@@ -194,6 +195,7 @@ public class LeaderBoard {
                     filter(repliesInThreeDaysFilter.and(timePredicate)).sorted(comparator).collect(Collectors.toList());
             } finally {
                 ComparisonDatabase.getInstance().readUnLock();
+                log.info("refreshing complete!");
                 rwLock.writeLock().unlock();
             }
         }
@@ -202,6 +204,7 @@ public class LeaderBoard {
         public RankingResultVo query(Predicate<Reply> filter, TimeRangeEnum timeRange, int pageSize, int pageNum) {
             ComparisonDatabase.getInstance().readLock();
             rwLock.readLock().lock();
+            log.debug("querying articles on page {} ", pageNum);
             try {
                 if (pageSize == 0 || pageNum < 1) {
                     return new RankingResultVo();
