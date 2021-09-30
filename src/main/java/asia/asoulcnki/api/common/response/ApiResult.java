@@ -1,6 +1,6 @@
 package asia.asoulcnki.api.common.response;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 
 public class ApiResult<T> {
 
@@ -116,7 +116,7 @@ public class ApiResult<T> {
 
     @Override
     public String toString() {
-        return JSONObject.toJSONString(this);
+        return JSON.toJSONString(this);
     }
 
 }
