@@ -12,15 +12,15 @@ public class CommonFilterRules {
         return r -> r.getSimilarLikeSum() > threshold;
     }
 
-	public static Predicate<Reply> likeNumGreaterThan(int threshold) {
-		return r -> r.getLikeNum() > threshold;
-	}
+    public static Predicate<Reply> likeNumGreaterThan(int threshold) {
+        return r -> r.getLikeNum() > threshold;
+    }
 
-	public static Predicate<Reply> similarLikeCountGreaterThan(int threshold) {
-		return r -> r.getSimilarCount() > threshold;
-	}
+    public static Predicate<Reply> similarLikeCountGreaterThan(int threshold) {
+        return r -> r.getSimilarCount() > threshold;
+    }
 
-	public static Predicate<Reply> alwaysTrue() {
-		return r -> true;
-	}
+    public static Predicate<Reply> alwaysTrue() {
+        return r -> true;
+    }
 }
