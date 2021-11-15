@@ -5,12 +5,33 @@ import java.util.ArrayList;
 
 public class SummaryHash {
 
+    /**
+     * 取样采取连续k个字符进行hash，即连续k个字符相同才判断为相同
+     */
 	public static final int DEFAULT_K = 8;
+    /**
+     * 默认的取样滑动窗口，即每个窗口宽度，每个窗口取最小值作为特征hash
+     */
 	public static final int DEFAULT_W = 8;
+    /**
+     * hash取模的模数，影响碰撞几率
+     */
 	private static final long DEFAULT_Q = 100001651L;
+    /**
+     * hash基数，为质数能减少碰撞
+     */
 	private static final int DEFAULT_B = 2;
 
 
+    /**
+     * 获取一个取样窗口(k个字符)字符串的hash值
+     * @param s 字符串
+     * @param nextStartOffset 下次取样开始下标
+     * @param k 敏感度 每n个字做摘要
+     * @param q 模数 摘要算法结果对其取模
+     * @param b 基数
+     * @return (此次取样hash值, 下次取样开始下标) Tuple<>
+     */
 	private static Tuple<Long, Integer> hashValue(String s, int nextStartOffset, int k, long q, int b) {
 		BigInteger hash = BigInteger.valueOf(0);
 		int offset = nextStartOffset;
@@ -32,6 +53,7 @@ public class SummaryHash {
 	}
 
 	/**
+     * 获取经过滑动窗口筛选的字符串hash结果
 	 * @param s 字符串
 	 * @param k 敏感度 每n个字做摘要
 	 * @param q 模数 摘要算法结果对其取模
@@ -56,6 +78,14 @@ public class SummaryHash {
 		return hashPicks;
 	}
 
+    /**
+     * 获取未经筛选的字符串hash结果
+     * @param s 字符串
+     * @param k 敏感度 每n个字做摘要
+     * @param q 模数 摘要算法结果对其取模
+     * @param b 基数
+     * @return 未经过筛选的字符串的摘要 ArrayList
+     */
 	public static ArrayList<Long> getStringHashVals(String s, int k, long q, int b) {
 		int codePointNumber = s.codePointCount(0, s.length());
 		int nextOffset = 0;
@@ -71,7 +101,13 @@ public class SummaryHash {
 		return hashVals;
 	}
 
-	// start = index, end = index + w
+    /**
+     * 在一个滑动窗口中选择合适的hash
+     * @param hashVals 待筛选的hash结果
+     * @param start 滑动窗口起始下标(index)
+     * @param end 滑动窗口结束下标(index+w)
+     * @return 选择出的hash值 long
+     */
 	private static long pickHash(ArrayList<Long> hashVals, int start, int end) {
 		int index = start;
 		long minHash = Long.MAX_VALUE;
@@ -84,9 +120,11 @@ public class SummaryHash {
 		return minHash;
 	}
 
-	// TODO w 的 长度 和 k 的长度
-	// 找评论区里表现不太好的查重结果
-	// 去掉空格和回车，标点符号之后再计算hash值
+    /**
+     * 使用默认参数取字符串s的hash
+     * @param s 待取hash的字符串
+     * @return hash结果 ArrayList
+     */
 	public static ArrayList<Long> defaultHash(String s) {
 		return hash(s, DEFAULT_K, DEFAULT_Q, DEFAULT_B, DEFAULT_W);
 	}
