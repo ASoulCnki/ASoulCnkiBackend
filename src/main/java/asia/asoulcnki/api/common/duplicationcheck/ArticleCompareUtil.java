@@ -12,6 +12,9 @@ import java.util.Set;
  * 小作文比对工具类
  */
 public class ArticleCompareUtil {
+    private ArticleCompareUtil() {
+    }
+
     /**
      * 判断小作文是否高度相似
      *
