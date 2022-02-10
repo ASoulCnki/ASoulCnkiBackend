@@ -20,7 +20,7 @@ public class UserSpeechHistoryList implements Serializable {
     private static final long serialVersionUID = 5554064566476229771L;
     private List<UserSpeechHistory> histories;
     public static final String DEFAULT_DATA_DIR = "data";
-    public static final String DEFAULT_IMAGE_FILE_NAME = "history.dat";
+    public static final String DEFAULT_IMAGE_FILE_NAME = "database.dat";
     private volatile static UserSpeechHistoryList instance;
     private final static Logger log = LoggerFactory.getLogger(UserSpeechHistoryList.class);
 
@@ -35,7 +35,7 @@ public class UserSpeechHistoryList implements Serializable {
                     try {
                         long start = System.currentTimeMillis();
                         log.info("start to load user speech database...");
-                        instance = loadFromImage(DEFAULT_DATA_DIR + "/" + DEFAULT_IMAGE_FILE_NAME);
+                        instance = loadFromImage(DEFAULT_DATA_DIR + File.separator + DEFAULT_IMAGE_FILE_NAME);
                         log.info("load database cost {} ms", System.currentTimeMillis() - start);
                     } catch (IOException e) {
                         log.error(e.getMessage(), e);
