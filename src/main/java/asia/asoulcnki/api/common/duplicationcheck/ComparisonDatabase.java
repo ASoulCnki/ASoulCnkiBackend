@@ -64,11 +64,10 @@ public class ComparisonDatabase {
                     try {
                         long start = System.currentTimeMillis();
                         log.info("start to load comparison database...");
-                        instance = loadFromImage(DEFAULT_DATA_DIR + File.pathSeparator + DEFAULT_IMAGE_FILE_NAME);
+                        instance = loadFromImage(DEFAULT_DATA_DIR + File.separator + DEFAULT_IMAGE_FILE_NAME);
                         log.info("load database cost {} ms", System.currentTimeMillis() - start);
                     } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-                        log.warn("loading comparison database failed, use empty database.");
+                        log.warn("loading comparison database failed, use empty database.", e);
                         instance = new ComparisonDatabase();
                     }
                     instance.rwLock = new ReentrantReadWriteLock();
@@ -180,7 +179,7 @@ public class ComparisonDatabase {
             folder.mkdirs();
         }
         Kryo kryo = new Kryo();
-        File file = new File(dataDir + File.pathSeparator + imageName);
+        File file = new File(dataDir + File.separator + imageName);
         Output output = new Output(new FileOutputStream(file));
         kryo.writeObject(output, this);
         output.close();
@@ -204,7 +203,6 @@ public class ComparisonDatabase {
         }
 
         Reply oldReply = replyMap.get(reply.getRpid());
-
 
         // update related like sum
         if (oldReply != null) {
@@ -243,10 +241,8 @@ public class ComparisonDatabase {
         }
 
         // add text hash to search database
-        for (final Long textHash : textHashList) {
-            textHashMap.computeIfAbsent(textHash, key -> textHashMap.put(key, new ArrayList<>()));
-            textHashMap.get(textHash).add(reply.getRpid());
-        }
+        textHashList.forEach(textHash -> textHashMap.computeIfAbsent(textHash, key -> new ArrayList<>()).add(reply.getRpid()));
+
     }
 
     private void updateRelatedLikeNum(Reply reply, Reply oldReply) {
