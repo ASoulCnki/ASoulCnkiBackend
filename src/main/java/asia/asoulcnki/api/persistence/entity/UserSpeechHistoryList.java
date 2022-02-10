@@ -20,7 +20,7 @@ public class UserSpeechHistoryList implements Serializable {
     private static final long serialVersionUID = 5554064566476229771L;
     private List<UserSpeechHistory> histories;
     public static final String DEFAULT_DATA_DIR = "data";
-    public static final String DEFAULT_IMAGE_FILE_NAME = "database.dat";
+    public static final String DEFAULT_IMAGE_FILE_NAME = "history.dat";
     private volatile static UserSpeechHistoryList instance;
     private final static Logger log = LoggerFactory.getLogger(UserSpeechHistoryList.class);
 
